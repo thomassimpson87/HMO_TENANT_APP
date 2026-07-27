@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ATPL Prep — Maths &amp; Physics Trainer</title>
+<style>
+:root{
+  --navy:#0a1730; --navy2:#0f2244; --card:#132a52; --card2:#1a3563;
+  --gold:#f2b632; --gold2:#ffd66e; --ink:#eaf0fb; --dim:#9fb0cc;
+  --green:#3ddc84; --red:#ff5c6c; --line:#22406f;
+}
+*{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+html,body{margin:0; padding:0;}
+body{
+  background:linear-gradient(180deg,var(--navy) 0%, #081226 100%);
+  color:var(--ink); min-height:100vh;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  font-size:16px; line-height:1.45;
+}
+.wrap{max-width:560px; margin:0 auto; padding:12px 14px 90px;}
+header.top{
+  display:flex; align-items:center; justify-content:space-between;
+  padding:10px 2px 6px;
+}
+.logo{font-weight:800; font-size:1.25rem; letter-spacing:.5px;}
+.logo span{color:var(--gold);}
+.chip{
+  background:var(--card); border:1px solid var(--line); color:var(--gold2);
+  border-radius:999px; padding:6px 12px; font-weight:700; font-size:.85rem;
+  white-space:nowrap;
+}
+.statrow{display:flex; gap:8px; margin:10px 0 14px;}
+.stat{
+  flex:1; background:var(--card); border:1px solid var(--line); border-radius:14px;
+  padding:10px 8px; text-align:center;
+}
+.stat b{display:block; font-size:1.15rem; color:var(--gold2);}
+.stat small{color:var(--dim); font-size:.72rem;}
+.card{
+  background:var(--card); border:1px solid var(--line); border-radius:16px;
+  padding:16px; margin-bottom:12px;
+}
+.card h3{margin:0 0 4px; font-size:1.05rem;}
+.card p{margin:0 0 10px; color:var(--dim); font-size:.9rem;}
+.btn{
+  display:block; width:100%; border:none; border-radius:14px;
+  min-height:56px; font-size:1.05rem; font-weight:800; cursor:pointer;
+  background:var(--gold); color:#1b1300; touch-action:manipulation;
+}
+.btn:active{transform:scale(.985);}
+.btn.ghost{background:var(--card2); color:var(--ink); border:1px solid var(--line);}
+.btn.small{min-height:44px; font-size:.95rem; border-radius:12px;}
+.btn[disabled]{opacity:.5;}
+.topic{
+  display:flex; align-items:center; gap:12px; width:100%;
+  background:var(--card); border:1px solid var(--line); border-radius:16px;
+  padding:13px 14px; margin-bottom:10px; cursor:pointer; color:var(--ink);
+  text-align:left; font-size:1rem; touch-action:manipulation;
+}
+.topic:active{background:var(--card2);}
+.topic .ic{font-size:1.5rem; width:36px; text-align:center;}
+.topic .tmain{flex:1; min-width:0;}
+.topic .tname{font-weight:700; font-size:.98rem;}
+.topic .tick{font-size:1.25rem; width:28px; text-align:center;}
+.tick.done{color:var(--green);}
+.tick.todo{color:#3a5687;}
+.bar{height:7px; background:#0c1c3a; border-radius:99px; margin-top:7px; overflow:hidden;}
+.bar i{display:block; height:100%; background:linear-gradient(90deg,var(--gold),var(--gold2)); border-radius:99px; transition:width .4s;}
+.bar.green i{background:var(--green);}
+.screen{display:none;}
+.screen.on{display:block;}
+/* quiz */
+.qhead{
+  display:flex; align-items:center; justify-content:space-between; gap:8px;
+  margin-bottom:10px;
+}
+.qhead .back{
+  background:var(--card); border:1px solid var(--line); color:var(--ink);
+  border-radius:12px; padding:9px 13px; font-size:1rem; cursor:pointer; font-weight:700;
+}
+.qhead .mid{flex:1; text-align:center; font-weight:800; font-size:.95rem; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+.flame{font-weight:800; color:var(--gold2); font-size:.98rem; white-space:nowrap;}
+.timer{font-variant-numeric:tabular-nums; font-weight:800; color:var(--gold2);}
+.timer.low{color:var(--red);}
+.concept{
+  background:linear-gradient(160deg,var(--card2),var(--card));
+  border:1px solid var(--gold); border-radius:18px; padding:18px; margin-bottom:14px;
+}
+.concept h2{margin:0 0 10px; font-size:1.2rem;}
+.concept ul{margin:0 0 12px; padding-left:20px;}
+.concept li{margin-bottom:6px; font-size:.95rem;}
+.formula{
+  background:#0c1c3a; border:1px dashed var(--gold); border-radius:12px;
+  padding:10px 12px; text-align:center; font-weight:800; color:var(--gold2);
+  font-size:1.08rem; margin-bottom:4px;
+}
+.qcard{background:var(--card); border:1px solid var(--line); border-radius:18px; padding:18px 16px; margin-bottom:12px;}
+.qtext{font-size:1.22rem; font-weight:700; line-height:1.4; margin-bottom:16px;}
+.opt{
+  display:block; width:100%; text-align:left;
+  background:var(--card2); color:var(--ink); border:1.5px solid var(--line);
+  border-radius:14px; min-height:56px; padding:14px 16px; margin-bottom:10px;
+  font-size:1.1rem; font-weight:700; cursor:pointer; touch-action:manipulation;
+}
+.opt:active{border-color:var(--gold);}
+.opt.right{background:#123c2a; border-color:var(--green); color:#c9ffe2;}
+.opt.wrong{background:#3c1420; border-color:var(--red); color:#ffd6da;}
+.opt[disabled]{cursor:default;}
+.working{
+  background:#0c1c3a; border:1px solid var(--gold); border-radius:14px;
+  padding:14px 16px; margin-bottom:12px;
+}
+.working h4{margin:0 0 8px; color:var(--gold2); font-size:.95rem; text-transform:uppercase; letter-spacing:.6px;}
+.working ol{margin:0; padding-left:20px;}
+.working li{margin-bottom:6px; font-size:.98rem;}
+.feedback{font-weight:800; font-size:1.05rem; margin-bottom:10px;}
+.feedback.good{color:var(--green);}
+.feedback.bad{color:var(--red);}
+.rowbtns{display:flex; gap:10px;}
+.rowbtns .btn{flex:1;}
+.toast{
+  position:fixed; left:50%; transform:translateX(-50%); bottom:24px;
+  background:var(--gold); color:#1b1300; font-weight:800; padding:12px 20px;
+  border-radius:99px; box-shadow:0 6px 24px rgba(0,0,0,.5); z-index:50;
+  opacity:0; transition:opacity .3s; pointer-events:none; max-width:90vw; text-align:center;
+}
+.toast.show{opacity:1;}
+/* results */
+.bigscore{text-align:center; padding:10px 0 4px;}
+.bigscore b{font-size:3rem; color:var(--gold2);}
+.bigscore div{color:var(--dim);}
+.trow{
+  display:flex; align-items:center; gap:10px; padding:10px 4px;
+  border-bottom:1px solid var(--line); font-size:.92rem;
+}
+.trow:last-child{border-bottom:none;}
+.trow .n{flex:1;}
+.trow .weak{color:var(--red); font-weight:800; font-size:.78rem;}
+.trow .sc{font-weight:800; color:var(--gold2); white-space:nowrap;}
+.trow .go{
+  background:var(--card2); color:var(--gold2); border:1px solid var(--line);
+  border-radius:10px; padding:7px 11px; font-weight:700; cursor:pointer; font-size:.85rem;
+}
+.foot{
+  text-align:center; color:#42598a; font-size:.78rem; margin-top:22px;
+}
+.foot button{background:none;border:none;color:#42598a;text-decoration:underline;cursor:pointer;font-size:.78rem;}
+.pill{display:inline-block; background:#0c1c3a; border:1px solid var(--line); border-radius:99px; padding:3px 10px; font-size:.75rem; color:var(--dim); margin-left:6px;}
+.donetag{color:var(--green); font-weight:800; font-size:.85rem;}
+sup{font-size:.72em;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ============ HOME ============ -->
+  <div class="screen on" id="scr-home">
+    <header class="top">
+      <div class="logo">ATPL<span>Prep</span> ✈️</div>
+      <div class="chip" id="daysChip">Test: 9 Aug</div>
+    </header>
+
+    <div class="statrow">
+      <div class="stat"><b id="stAnswered">0</b><small>answered</small></div>
+      <div class="stat"><b id="stAcc">—</b><small>accuracy</small></div>
+      <div class="stat"><b id="stStreak">0</b><small>best streak 🔥</small></div>
+      <div class="stat"><b id="stMastered">0/13</b><small>mastered</small></div>
+    </div>
+
+    <div class="card">
+      <h3>☀️ Daily warm-up <span class="donetag" id="warmDone" style="display:none">Done today ✓</span></h3>
+      <p>10 quick questions mixing everything you've covered so far.</p>
+      <button class="btn" id="btnWarm">Start warm-up</button>
+    </div>
+
+    <div class="card">
+      <h3>⏱️ Test mode <span class="pill" id="lastTest" style="display:none"></span></h3>
+      <p>20 random questions, 40-minute timer, weak-topic breakdown at the end.</p>
+      <button class="btn ghost" id="btnTest">Start mock test</button>
+    </div>
+
+    <h3 style="margin:18px 4px 10px;">Topics <span class="pill">tap to practise — 12 correct = mastered</span></h3>
+    <div id="topicList"></div>
+
+    <div class="foot">
+      Progress saves automatically on this device.<br>
+      <button id="btnReset">Reset all progress</button>
+    </div>
+  </div>
+
+  <!-- ============ CONCEPT ============ -->
+  <div class="screen" id="scr-concept">
+    <div class="qhead">
+      <button class="back" id="cBack">‹ Back</button>
+      <div class="mid" id="cTitle"></div>
+      <div style="width:64px"></div>
+    </div>
+    <div class="concept">
+      <h2 id="cName"></h2>
+      <ul id="cLines"></ul>
+      <div class="formula" id="cFormula"></div>
+    </div>
+    <button class="btn" id="cStart">Start questions ➜</button>
+  </div>
+
+  <!-- ============ QUIZ ============ -->
+  <div class="screen" id="scr-quiz">
+    <div class="qhead">
+      <button class="back" id="qBack">‹ Exit</button>
+      <div class="mid" id="qTitle"></div>
+      <div class="flame" id="qRight">🔥 0</div>
+    </div>
+    <div class="bar" style="margin-bottom:12px;"><i id="qBar" style="width:0%"></i></div>
+    <div class="qcard">
+      <div class="qtext" id="qText"></div>
+      <div id="qOpts"></div>
+    </div>
+    <div id="qFeed"></div>
+  </div>
+
+  <!-- ============ RESULTS ============ -->
+  <div class="screen" id="scr-results">
+    <div class="qhead">
+      <button class="back" id="rBack">‹ Home</button>
+      <div class="mid" id="rTitle">Results</div>
+      <div style="width:64px"></div>
+    </div>
+    <div class="card">
+      <div class="bigscore"><b id="rScore"></b><div id="rSub"></div></div>
+    </div>
+    <div class="card" id="rBreakCard">
+      <h3>Topic breakdown</h3>
+      <div id="rRows"></div>
+    </div>
+    <button class="btn" id="rAgain">Go again</button>
+  </div>
+
+</div>
+<div class="toast" id="toast"></div>
+
+<script id="core">
+/* ================= helpers ================= */
+const ri=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;};
+const fmt=n=>{
+  if(typeof n!=='number')return String(n);
+  const r=Math.round(n*100)/100;
+  return Math.abs(r)>=10000&&Number.isInteger(r)?r.toLocaleString('en-GB'):String(r);
+};
+function distract(c){
+  const set=new Set([Math.round(c*100)/100]),out=[];
+  const cands=shuffle([c+1,c-1,c+2,c-2,c*2,c/2,c+10,c-10,c+5,c-5,c*10,c/10,c+0.5,c-0.5,c+100,c-100,c+0.1,c-0.1,c+3,c-3,c+20,c-20]);
+  for(const v of cands){
+    const r=Math.round(v*100)/100;
+    if(!isFinite(r)||set.has(r))continue;
+    if(c>0&&r<=0)continue;
+    if(Number.isInteger(c)&&!Number.isInteger(r))continue;
+    set.add(r);out.push(r);
+    if(out.length===3)break;
+  }
+  let k=0;
+  const step=Math.max(1,Math.round(Math.abs(c)*0.15))||1;
+  while(out.length<3){
+    k++;
+    const r=Math.round((c+step*k)*100)/100;
+    if(!set.has(r)){set.add(r);out.push(r);}
+  }
+  return out;
+}
+/* gen wrapper: d = difficulty 1-3, f returns {text, correct, wrong?, unit?, steps} */
+const g=(d,f)=>({d,f});
+
+/* ================= TOPICS & GENERATORS ================= */
+const TOPICS=[
+/* ---------- 1 REARRANGING ---------- */
+{id:'rearr',name:'Rearranging equations',icon:'🔧',
+ concept:['Whatever you do to one side, do to the other.','Undo operations in reverse: + ↔ −, × ↔ ÷.','Get the letter you want on its own, step by step.'],
+ formula:'v = d ÷ t &nbsp;→&nbsp; d = v × t &nbsp;→&nbsp; t = d ÷ v',
+ gens:[
+  g(1,()=>{const a=ri(4,18),x=ri(3,25),b=x+a;return{text:`Solve for x:<br>x + ${a} = ${b}`,correct:x,
+   steps:[`Subtract ${a} from both sides.`,`x = ${b} − ${a}`,`x = ${x}`]};}),
+  g(1,()=>{const a=ri(4,15),x=a+ri(1,15),rhs=x-a;return{text:`Solve for x:<br>x − ${a} = ${rhs}`,correct:x,
+   steps:[`Add ${a} to both sides.`,`x = ${rhs} + ${a}`,`x = ${x}`]};}),
+  g(1,()=>{const a=ri(2,9),x=ri(2,12),b=a*x;return{text:`Solve for x:<br>${a}x = ${b}`,correct:x,
+   steps:[`Divide both sides by ${a}.`,`x = ${b} ÷ ${a}`,`x = ${x}`]};}),
+  g(1,()=>{const a=ri(2,8),b=ri(2,12),x=a*b;return{text:`Solve for x:<br>x ÷ ${a} = ${b}`,correct:x,
+   steps:[`Multiply both sides by ${a}.`,`x = ${b} × ${a}`,`x = ${x}`]};}),
+  g(2,()=>{const a=ri(2,7),x=ri(2,12),b=ri(2,15),c=a*x+b;return{text:`Solve for x:<br>${a}x + ${b} = ${c}`,correct:x,
+   steps:[`Subtract ${b} from both sides: ${a}x = ${c-b}`,`Divide by ${a}: x = ${c-b} ÷ ${a}`,`x = ${x}`]};}),
+  g(2,()=>{const p=pick([
+   {q:'v = d ÷ t. Rearrange for t.',a:'t = d ÷ v',w:['t = v ÷ d','t = v × d','t = d − v'],s:['Multiply both sides by t: v × t = d','Divide both sides by v: t = d ÷ v']},
+   {q:'v = d ÷ t. Rearrange for d.',a:'d = v × t',w:['d = v ÷ t','d = t ÷ v','d = v + t'],s:['Multiply both sides by t.','d = v × t']},
+   {q:'F = m × a. Rearrange for a.',a:'a = F ÷ m',w:['a = m ÷ F','a = F × m','a = F − m'],s:['Divide both sides by m.','a = F ÷ m']},
+   {q:'V = I × R. Rearrange for I.',a:'I = V ÷ R',w:['I = R ÷ V','I = V × R','I = V − R'],s:['Divide both sides by R.','I = V ÷ R']},
+   {q:'ρ = m ÷ V. Rearrange for m.',a:'m = ρ × V',w:['m = ρ ÷ V','m = V ÷ ρ','m = ρ + V'],s:['Multiply both sides by V.','m = ρ × V']},
+   {q:'P = W ÷ t. Rearrange for W.',a:'W = P × t',w:['W = P ÷ t','W = t ÷ P','W = P − t'],s:['Multiply both sides by t.','W = P × t']},
+  ]);return{text:p.q,correct:p.a,wrong:p.w,steps:p.s};}),
+  g(2,()=>{const a=ri(2,6),b=ri(2,8),c=ri(2,9),x=a*(b+c);return{text:`Solve for x:<br>x ÷ ${a} − ${b} = ${c}`,correct:x,
+   steps:[`Add ${b} to both sides: x ÷ ${a} = ${b+c}`,`Multiply by ${a}: x = ${b+c} × ${a}`,`x = ${x}`]};}),
+  g(3,()=>{const a=ri(2,6),b=ri(1,8),x=ri(2,10),c=a*(x+b);return{text:`Solve for x:<br>${a}(x + ${b}) = ${c}`,correct:x,
+   steps:[`Divide both sides by ${a}: x + ${b} = ${c/a}`,`Subtract ${b}: x = ${c/a} − ${b}`,`x = ${x}`]};}),
+  g(3,()=>{const b=ri(2,6),c=ri(3,12),a=ri(1,10),x=b*c-a;return{text:`Solve for x:<br>(x + ${a}) ÷ ${b} = ${c}`,correct:x,
+   steps:[`Multiply both sides by ${b}: x + ${a} = ${b*c}`,`Subtract ${a}: x = ${b*c} − ${a}`,`x = ${x}`]};}),
+  g(3,()=>{const p=pick([
+   {q:'v² = u² + 2as. Rearrange for a.',a:'a = (v² − u²) ÷ 2s',w:['a = (v² + u²) ÷ 2s','a = 2s ÷ (v² − u²)','a = (v − u) ÷ 2s'],s:['Subtract u² from both sides: v² − u² = 2as','Divide both sides by 2s.','a = (v² − u²) ÷ 2s']},
+   {q:'E = ½mv². Rearrange for v.',a:'v = √(2E ÷ m)',w:['v = 2E ÷ m','v = √(E ÷ 2m)','v = (2E ÷ m)²'],s:['Multiply both sides by 2: 2E = mv²','Divide by m: v² = 2E ÷ m','Square root both sides.']},
+   {q:'P = F ÷ A. Rearrange for A.',a:'A = F ÷ P',w:['A = P ÷ F','A = P × F','A = F − P'],s:['Multiply both sides by A: P × A = F','Divide both sides by P.','A = F ÷ P']},
+   {q:'Q = mcΔT. Rearrange for c.',a:'c = Q ÷ (m × ΔT)',w:['c = m × ΔT ÷ Q','c = Q × m × ΔT','c = Q − mΔT'],s:['Divide both sides by m and by ΔT.','c = Q ÷ (m × ΔT)']},
+  ]);return{text:p.q,correct:p.a,wrong:p.w,steps:p.s};}),
+ ]},
+/* ---------- 2 SPEED DISTANCE TIME ---------- */
+{id:'sdt',name:'Speed, distance, time & fuel',icon:'⏱️',
+ concept:['Speed = distance ÷ time. Cover one, read the other two.','Knots = nautical miles per hour. 120 kt = 2 nm every minute.','Fuel used = burn rate × time.'],
+ formula:'S = D ÷ T &nbsp;•&nbsp; Fuel = rate × time',
+ gens:[
+  g(1,()=>{const s=pick([90,110,120,150,180,200,240]),t=ri(1,4),d=s*t;return{text:`An aircraft flies ${d} nm in ${t} hour${t>1?'s':''}. Average speed?`,correct:s,unit:' kt',
+   steps:[`Speed = distance ÷ time`,`Speed = ${d} ÷ ${t}`,`= ${s} kt`]};}),
+  g(1,()=>{const s=pick([100,120,150,180,200,220]),t=ri(1,4),d=s*t;return{text:`Groundspeed ${s} kt for ${t} hour${t>1?'s':''}. Distance covered?`,correct:d,unit:' nm',
+   steps:[`Distance = speed × time`,`Distance = ${s} × ${t}`,`= ${d} nm`]};}),
+  g(1,()=>{const s=pick([100,120,150,200]),t=ri(2,4),d=s*t;return{text:`How long to fly ${d} nm at ${s} kt?`,correct:t,unit:' h',
+   steps:[`Time = distance ÷ speed`,`Time = ${d} ÷ ${s}`,`= ${t} hours`]};}),
+  g(2,()=>{const nmpm=pick([2,3,4,5]),s=nmpm*60,t=pick([5,10,15,20,30]),d=nmpm*t;return{text:`At ${s} kt, how far do you travel in ${t} minutes?`,correct:d,unit:' nm',
+   steps:[`${s} kt = ${s} nm per hour = ${nmpm} nm per minute (÷60).`,`Distance = ${nmpm} × ${t}`,`= ${d} nm`]};}),
+  g(2,()=>{const r=pick([20,30,40,50,60]),t=pick([1,1.5,2,2.5,3]),f=r*t;return{text:`Fuel burn is ${r} litres/hour. How much fuel for a ${fmt(t)}-hour flight?`,correct:f,unit:' L',
+   steps:[`Fuel = rate × time`,`Fuel = ${r} × ${fmt(t)}`,`= ${fmt(f)} litres`]};}),
+  g(2,()=>{const r=pick([20,30,40,60]),t=pick([2,2.5,3,4]),f=r*t;return{text:`You have ${fmt(f)} litres of fuel and burn ${r} L/h. Endurance?`,correct:t,unit:' h',
+   steps:[`Endurance = fuel ÷ rate`,`= ${fmt(f)} ÷ ${r}`,`= ${fmt(t)} hours`]};}),
+  g(2,()=>{const h=pick([1.5,2.5,0.75,1.25]),m=h*60;return{text:`A leg takes ${fmt(h)} hours. How many minutes is that?`,correct:m,unit:' min',
+   steps:[`1 hour = 60 minutes`,`${fmt(h)} × 60 = ${fmt(m)} minutes`]};}),
+  g(3,()=>{const tas=pick([100,120,150,180]),w=pick([20,30,40]),head=Math.random()<.5,gs=head?tas-w:tas+w,t=ri(1,2),d=gs*t;
+   return{text:`TAS ${tas} kt with a ${w} kt ${head?'headwind':'tailwind'}. How far in ${t} hour${t>1?'s':''}?`,correct:d,unit:' nm',
+   steps:[`Groundspeed = TAS ${head?'−':'+'} wind = ${tas} ${head?'−':'+'} ${w} = ${gs} kt`,`Distance = ${gs} × ${t}`,`= ${d} nm`]};}),
+  g(3,()=>{const r=pick([40,60,80]),t=ri(1,2),res=r*0.75,f=r*t+res;return{text:`Burn rate ${r} L/h, flight time ${t} h, plus a 45-minute reserve. Total fuel required?`,correct:f,unit:' L',
+   steps:[`Trip fuel = ${r} × ${t} = ${r*t} L`,`Reserve = 45 min = 0.75 h → ${r} × 0.75 = ${fmt(res)} L`,`Total = ${r*t} + ${fmt(res)} = ${fmt(f)} L`]};}),
+  g(3,()=>{const nmpm=pick([2,3,4,5]),s=nmpm*60,m=pick([12,15,20,25,30]),d=nmpm*m;return{text:`How many minutes to fly ${d} nm at ${s} kt?`,correct:m,unit:' min',
+   steps:[`${s} kt = ${nmpm} nm per minute (÷60).`,`Time = ${d} ÷ ${nmpm}`,`= ${m} minutes`]};}),
+ ]},
+/* ---------- 3 TRIG ---------- */
+{id:'trig',name:'Trigonometry (SOHCAHTOA)',icon:'📐',
+ concept:['SOH-CAH-TOA: sin = Opp/Hyp, cos = Adj/Hyp, tan = Opp/Adj.','Hypotenuse = longest side, opposite the right angle.','Key values: sin 30° = 0.5, tan 45° = 1, cos 60° = 0.5.'],
+ formula:'sin θ = O/H &nbsp; cos θ = A/H &nbsp; tan θ = O/A',
+ gens:[
+  g(1,()=>{const p=pick([
+   {k:'opposite and the hypotenuse',a:'sine',w:['cosine','tangent','Pythagoras']},
+   {k:'adjacent and the hypotenuse',a:'cosine',w:['sine','tangent','Pythagoras']},
+   {k:'opposite and the adjacent',a:'tangent',w:['sine','cosine','Pythagoras']},
+  ]);return{text:`In a right-angled triangle you know the ${p.k}. Which ratio links them to the angle?`,correct:p.a,wrong:p.w,
+   steps:['SOH-CAH-TOA:','Sin = Opp ÷ Hyp, Cos = Adj ÷ Hyp, Tan = Opp ÷ Adj',`Here the answer is ${p.a}.`]};}),
+  g(1,()=>{const p=pick([
+   {q:'sin 30°',a:'0.5',w:['0.87','1','0.7']},{q:'cos 60°',a:'0.5',w:['0.87','1','0.7']},
+   {q:'tan 45°',a:'1',w:['0.5','0.7','0.87']},{q:'sin 90°',a:'1',w:['0','0.5','0.87']},
+   {q:'cos 0°',a:'1',w:['0','0.5','0.7']},{q:'sin 45°',a:'≈ 0.7',w:['0.5','1','≈ 0.87']},
+   {q:'cos 30°',a:'≈ 0.87',w:['0.5','≈ 0.7','1']},
+  ]);return{text:`What is ${p.q}?`,correct:p.a,wrong:p.w,
+   steps:['Learn the key values: sin 30° = cos 60° = 0.5','sin 45° = cos 45° ≈ 0.7, sin 60° = cos 30° ≈ 0.87','tan 45° = 1, sin 90° = 1',`So ${p.q} = ${p.a}`]};}),
+  g(1,()=>{return{text:'What is the name of the side opposite the right angle?',correct:'hypotenuse',wrong:['opposite','adjacent','base'],
+   steps:['The hypotenuse is always the longest side,','and always sits opposite the 90° angle.']};}),
+  g(2,()=>{const h=pick([10,20,40,60]),p=pick([{ang:30,f:0.5,fn:'sin',side:'opposite'},{ang:60,f:0.5,fn:'cos',side:'adjacent'}]);const o=h*p.f;
+   return{text:`Hypotenuse = ${h}, angle = ${p.ang}°. Find the ${p.side} side.`,correct:o,
+   steps:[`${p.side==='opposite'?'Opp = Hyp × sin θ':'Adj = Hyp × cos θ'}`,`= ${h} × ${p.fn} ${p.ang}° = ${h} × ${p.f}`,`= ${fmt(o)}`]};}),
+  g(2,()=>{const o=pick([5,8,10,15,25]),h=o*2;return{text:`The side opposite a 30° angle is ${o}. Find the hypotenuse.`,correct:h,
+   steps:['sin 30° = Opp ÷ Hyp, and sin 30° = 0.5','Hyp = Opp ÷ 0.5 = Opp × 2',`= ${o} × 2 = ${h}`]};}),
+  g(2,()=>{const p=pick([
+   {q:'opposite = 6 and adjacent = 6',a:'45°',w:['30°','60°','90°'],s:['tan θ = Opp ÷ Adj = 6 ÷ 6 = 1','tan 45° = 1, so θ = 45°']},
+   {q:'opposite = 5 and hypotenuse = 10',a:'30°',w:['45°','60°','15°'],s:['sin θ = Opp ÷ Hyp = 5 ÷ 10 = 0.5','sin 30° = 0.5, so θ = 30°']},
+   {q:'adjacent = 4 and hypotenuse = 8',a:'60°',w:['30°','45°','80°'],s:['cos θ = Adj ÷ Hyp = 4 ÷ 8 = 0.5','cos 60° = 0.5, so θ = 60°']},
+  ]);return{text:`A right-angled triangle has ${p.q}. Find the angle θ.`,correct:p.a,wrong:p.w,steps:p.s};}),
+  g(3,()=>{const t=pick([[3,4,5],[6,8,10],[5,12,13],[9,12,15],[8,15,17]]);return{text:`A right-angled triangle has shorter sides ${t[0]} and ${t[1]}. Find the hypotenuse.`,correct:t[2],
+   steps:['Pythagoras: c² = a² + b²',`c² = ${t[0]}² + ${t[1]}² = ${t[0]*t[0]} + ${t[1]*t[1]} = ${t[2]*t[2]}`,`c = √${t[2]*t[2]} = ${t[2]}`]};}),
+  g(3,()=>{const t=pick([[3,4,5],[6,8,10],[5,12,13],[9,12,15]]);return{text:`A right-angled triangle has hypotenuse ${t[2]} and one side ${t[1]}. Find the other side.`,correct:t[0],
+   steps:['Pythagoras: a² = c² − b²',`a² = ${t[2]}² − ${t[1]}² = ${t[2]*t[2]} − ${t[1]*t[1]} = ${t[0]*t[0]}`,`a = √${t[0]*t[0]} = ${t[0]}`]};}),
+  g(3,()=>{const n=pick([2,3,4,5,6,8,10]),loss=300*n;return{text:`On a 3° glideslope you lose ≈300 ft per nm. Height lost over ${n} nm?`,correct:loss,unit:' ft',
+   steps:['Rule of thumb: tan 3° ≈ 0.05, and 0.05 × 6076 ft ≈ 300 ft per nm.',`Height loss = 300 × ${n}`,`= ${fmt(loss)} ft`]};}),
+ ]},
+/* ---------- 4 FRACTIONS PERCENTAGES RATIOS ---------- */
+{id:'frac',name:'Fractions, percentages, ratios',icon:'➗',
+ concept:['Fraction of an amount: divide by the bottom, times the top.','10% = ÷10. Build others from it: 5% is half of 10%, 15% = 10% + 5%.','Ratio a:b has (a+b) parts — find one part first.'],
+ formula:'x% of N = N × x ÷ 100',
+ gens:[
+  g(1,()=>{const d=pick([2,3,4,5,8,10]),n=ri(1,d-1),m=ri(2,9),N=d*m,ans=n*m;return{text:`What is ${n}/${d} of ${N}?`,correct:ans,
+   steps:[`Divide by the bottom: ${N} ÷ ${d} = ${m}`,`Multiply by the top: ${m} × ${n}`,`= ${ans}`]};}),
+  g(1,()=>{const p=pick([10,20,25,50,75,5]),N=pick([40,60,80,120,200,240]),ans=N*p/100;return{text:`What is ${p}% of ${N}?`,correct:ans,
+   steps:[`10% of ${N} = ${N/10}`,`${p}% = ${fmt(N/10)} × ${p/10}`,`= ${fmt(ans)}`]};}),
+  g(2,()=>{const p=pick([15,30,35,40,60,90]),N=pick([40,60,80,120,200]),ans=N*p/100;return{text:`What is ${p}% of ${N}?`,correct:ans,
+   steps:[`10% of ${N} = ${N/10}`,`Build it up: ${p}% = ${p/5} lots of 5% (or ${N/10} × ${p}⁄10)`,`${N} × ${p}/100 = ${fmt(ans)}`]};}),
+  g(2,()=>{const N=pick([40,60,80,120,200]),p=pick([10,20,25,50]),up=Math.random()<.5,ans=up?N*(1+p/100):N*(1-p/100);
+   return{text:`A ${N} kg load ${up?'increases':'decreases'} by ${p}%. New mass?`,correct:ans,unit:' kg',
+   steps:[`${p}% of ${N} = ${fmt(N*p/100)}`,`New mass = ${N} ${up?'+':'−'} ${fmt(N*p/100)}`,`= ${fmt(ans)} kg`]};}),
+  g(2,()=>{const r=pick([[1,2],[2,3],[3,4],[1,3],[2,5],[3,5]]),u=pick([5,10,15,20]),T=(r[0]+r[1])*u,share=r[0]*u;
+   return{text:`Split ${T} kg of cargo between two holds in the ratio ${r[0]} : ${r[1]}. How much goes in the first hold?`,correct:share,unit:' kg',
+   steps:[`Total parts = ${r[0]} + ${r[1]} = ${r[0]+r[1]}`,`One part = ${T} ÷ ${r[0]+r[1]} = ${u} kg`,`First hold = ${r[0]} × ${u} = ${share} kg`]};}),
+  g(2,()=>{const p=pick([
+   {q:'Write 3/4 as a percentage.',a:'75%',w:['34%','43%','80%'],s:['3 ÷ 4 = 0.75','0.75 × 100 = 75%']},
+   {q:'Write 2/5 as a percentage.',a:'40%',w:['25%','20%','52%'],s:['2 ÷ 5 = 0.4','0.4 × 100 = 40%']},
+   {q:'Write 1/8 as a percentage.',a:'12.5%',w:['18%','8%','25%'],s:['1 ÷ 8 = 0.125','0.125 × 100 = 12.5%']},
+   {q:'Write 60% as a fraction in simplest form.',a:'3/5',w:['6/10','1/6','2/3'],s:['60% = 60/100','Divide top and bottom by 20: 3/5']},
+   {q:'Write 25% as a decimal.',a:'0.25',w:['2.5','0.4','0.025'],s:['25% = 25 ÷ 100','= 0.25']},
+   {q:'Write 0.7 as a percentage.',a:'70%',w:['7%','0.7%','17%'],s:['0.7 × 100','= 70%']},
+  ]);return{text:p.q,correct:p.a,wrong:p.w,steps:p.s};}),
+  g(3,()=>{const orig=pick([40,60,80,120]),p=pick([25,50,10,20]),now=orig*(1+p/100);
+   return{text:`After a ${p}% increase, a landing fee is £${fmt(now)}. What was it originally?`,correct:orig,unit:'',
+   steps:[`A ${p}% increase means × ${fmt(1+p/100)}`,`Original = ${fmt(now)} ÷ ${fmt(1+p/100)}`,`= £${orig}`]};}),
+  g(3,()=>{const p=pick([
+   {q:'12 : 16',a:'3 : 4',w:['6 : 8','4 : 3','2 : 3']},{q:'15 : 25',a:'3 : 5',w:['5 : 3','1 : 2','3 : 4']},
+   {q:'14 : 21',a:'2 : 3',w:['7 : 10','3 : 2','1 : 2']},{q:'18 : 24',a:'3 : 4',w:['9 : 12','2 : 3','4 : 5']},
+   {q:'20 : 50',a:'2 : 5',w:['4 : 10','1 : 3','5 : 2']},{q:'9 : 27',a:'1 : 3',w:['3 : 9','1 : 4','3 : 1']},
+  ]);return{text:`Simplify the ratio ${p.q} fully.`,correct:p.a,wrong:p.w,
+   steps:['Divide both numbers by their highest common factor.',`${p.q} → ${p.a}`]};}),
+  g(3,()=>{const p=pick([
+   {q:'1/2 + 1/4',a:'3/4',w:['2/6','1/3','2/4'],s:['Common denominator 4: 1/2 = 2/4','2/4 + 1/4 = 3/4']},
+   {q:'2/3 × 3/4',a:'1/2',w:['5/7','8/9','1/3'],s:['Multiply tops and bottoms: 6/12','Simplify: 6/12 = 1/2']},
+   {q:'3/4 − 1/2',a:'1/4',w:['1/2','1/3','3/8'],s:['Common denominator 4: 1/2 = 2/4','3/4 − 2/4 = 1/4']},
+   {q:'1/2 ÷ 1/4',a:'2',w:['1/8','1/2','4'],s:['Dividing = multiply by the reciprocal','1/2 × 4/1 = 4/2 = 2']},
+   {q:'1/3 + 1/6',a:'1/2',w:['2/9','5/6','1/4'],s:['Common denominator 6: 1/3 = 2/6','2/6 + 1/6 = 3/6 = 1/2']},
+   {q:'2/5 + 1/5',a:'3/5',w:['3/10','2/5','1/2'],s:['Same denominator — just add the tops.','2/5 + 1/5 = 3/5']},
+  ]);return{text:`Work out: ${p.q}`,correct:p.a,wrong:p.w,steps:p.s};}),
+ ]},
+/* ---------- 5 UNIT CONVERSIONS ---------- */
+{id:'units',name:'Unit conversions',icon:'🔄',
+ concept:['1 kg ≈ 2.2 lb • 1 nm ≈ 1.85 km • 1000 ft ≈ 300 m.','°F = (°C × 1.8) + 32. And 15 °C = 59 °F (ISA!).','m/s → km/h: multiply by 3.6. 1 kt = 1 nm per hour.'],
+ formula:'°F = 1.8 × °C + 32',
+ gens:[
+  g(1,()=>{const kg=pick([10,20,50,100]),lb=kg*2.2,rev=Math.random()<.5;
+   return rev?{text:`Convert ${fmt(lb)} lb to kg (1 kg ≈ 2.2 lb).`,correct:kg,unit:' kg',
+    steps:[`kg = lb ÷ 2.2`,`= ${fmt(lb)} ÷ 2.2`,`= ${kg} kg`]}
+   :{text:`Convert ${kg} kg to pounds (1 kg ≈ 2.2 lb).`,correct:lb,unit:' lb',
+    steps:[`lb = kg × 2.2`,`= ${kg} × 2.2`,`= ${fmt(lb)} lb`]};}),
+  g(1,()=>{const ft=pick([1000,2000,3000,5000,10000]),m=ft*0.3,rev=Math.random()<.5;
+   return rev?{text:`Convert ${fmt(m)} m to feet (1000 ft ≈ 300 m).`,correct:ft,unit:' ft',
+    steps:['1000 ft ≈ 300 m, so metres ÷ 0.3 = feet',`${fmt(m)} ÷ 0.3 = ${fmt(ft)} ft`]}
+   :{text:`Convert ${fmt(ft)} ft to metres (1000 ft ≈ 300 m).`,correct:m,unit:' m',
+    steps:['1000 ft ≈ 300 m, so feet × 0.3 = metres',`${fmt(ft)} × 0.3 = ${fmt(m)} m`]};}),
+  g(1,()=>{const nm=pick([2,10,20,100,200]),km=nm*1.85;return{text:`Convert ${nm} nm to km (1 nm ≈ 1.85 km).`,correct:km,unit:' km',
+   steps:[`km = nm × 1.85`,`= ${nm} × 1.85`,`= ${fmt(km)} km`]};}),
+  g(2,()=>{const p=pick([[0,32],[10,50],[15,59],[20,68],[30,86],[100,212],[-40,-40]]);
+   return{text:`Convert ${p[0]} °C to °F.`,correct:p[1],unit:' °F',
+   steps:['°F = (°C × 1.8) + 32',`= (${p[0]} × 1.8) + 32 = ${fmt(p[0]*1.8)} + 32`,`= ${p[1]} °F`]};}),
+  g(2,()=>{const p=pick([[0,32],[10,50],[15,59],[20,68],[100,212],[-40,-40]]);
+   return{text:`Convert ${p[1]} °F to °C.`,correct:p[0],unit:' °C',
+   steps:['°C = (°F − 32) ÷ 1.8',`= (${p[1]} − 32) ÷ 1.8 = ${fmt(p[1]-32)} ÷ 1.8`,`= ${p[0]} °C`]};}),
+  g(2,()=>{const h=pick([0.25,0.5,0.75,1.5,2.25]),m=h*60,rev=Math.random()<.5;
+   return rev?{text:`Convert ${fmt(m)} minutes to hours (as a decimal).`,correct:h,unit:' h',
+    steps:[`Hours = minutes ÷ 60`,`= ${fmt(m)} ÷ 60`,`= ${fmt(h)} h`]}
+   :{text:`Convert ${fmt(h)} hours to minutes.`,correct:m,unit:' min',
+    steps:[`Minutes = hours × 60`,`= ${fmt(h)} × 60`,`= ${fmt(m)} min`]};}),
+  g(2,()=>{return{text:'One knot is a speed of…',correct:'1 nautical mile per hour',wrong:['1 km per hour','1 mile per minute','1 nm per minute'],
+   steps:['Knot = nautical mile per hour.','So 300 kt = 300 nm each hour = 5 nm per minute.']};}),
+  g(3,()=>{const ms=pick([10,20,25,30,100]),kmh=ms*3.6,rev=Math.random()<.5;
+   return rev?{text:`Convert ${fmt(kmh)} km/h to m/s.`,correct:ms,unit:' m/s',
+    steps:['m/s = km/h ÷ 3.6',`= ${fmt(kmh)} ÷ 3.6`,`= ${ms} m/s`]}
+   :{text:`Convert ${ms} m/s to km/h.`,correct:kmh,unit:' km/h',
+    steps:['km/h = m/s × 3.6',`= ${ms} × 3.6`,`= ${fmt(kmh)} km/h`]};}),
+  g(3,()=>{const L=pick([50,100,150,200]),kg=L*0.8,rev=Math.random()<.5;
+   return rev?{text:`Avgas density is 0.8 kg/L. How many litres is ${fmt(kg)} kg of fuel?`,correct:L,unit:' L',
+    steps:['Litres = mass ÷ density',`= ${fmt(kg)} ÷ 0.8`,`= ${L} litres`]}
+   :{text:`Avgas density is 0.8 kg/L. What is the mass of ${L} litres?`,correct:kg,unit:' kg',
+    steps:['Mass = volume × density',`= ${L} × 0.8`,`= ${fmt(kg)} kg`]};}),
+ ]},
+/* ---------- 6 INDICES & STANDARD FORM ---------- */
+{id:'indices',name:'Indices & standard form',icon:'🔢',
+ concept:['Multiply powers → add indices. Divide → subtract. Power of power → multiply.','Standard form: a × 10ⁿ with 1 ≤ a &lt; 10.','Negative index = 1 over: 10⁻² = 0.01.'],
+ formula:'x<sup>a</sup> × x<sup>b</sup> = x<sup>a+b</sup>',
+ gens:[
+  g(1,()=>{const p=pick([[2,2,4],[2,3,8],[2,4,16],[2,5,32],[2,6,64],[3,2,9],[3,3,27],[4,2,16],[5,2,25],[10,3,1000],[10,4,10000]]);
+   return{text:`Evaluate ${p[0]}<sup>${p[1]}</sup>`,correct:p[2],
+   steps:[`${p[0]}<sup>${p[1]}</sup> means ${p[0]} multiplied by itself ${p[1]} times.`,`= ${p[2]}`]};}),
+  g(1,()=>{const n=pick([49,64,81,100,144,169,225]),r=Math.sqrt(n);return{text:`What is √${n}?`,correct:r,
+   steps:[`${r} × ${r} = ${n}`,`So √${n} = ${r}`]};}),
+  g(1,()=>{const base=pick(['x','10']),a=ri(2,6),b=ri(2,6);const c=a+b;const wrongs=[a*b,Math.abs(a-b)||c+3,c+2].map(e=>`${base}<sup>${e}</sup>`);
+   return{text:`Simplify ${base}<sup>${a}</sup> × ${base}<sup>${b}</sup>`,correct:`${base}<sup>${c}</sup>`,wrong:wrongs,
+   steps:['Multiplying powers of the same base: add the indices.',`${a} + ${b} = ${c}`,`Answer: ${base}<sup>${c}</sup>`]};}),
+  g(2,()=>{const base=pick(['x','10']),b=ri(2,4),a=b+ri(1,4);const c=a-b;const wrongs=[a+b,a*b,c+1].map(e=>`${base}<sup>${e}</sup>`);
+   return{text:`Simplify ${base}<sup>${a}</sup> ÷ ${base}<sup>${b}</sup>`,correct:`${base}<sup>${c}</sup>`,wrong:wrongs,
+   steps:['Dividing powers of the same base: subtract the indices.',`${a} − ${b} = ${c}`,`Answer: ${base}<sup>${c}</sup>`]};}),
+  g(2,()=>{const a=ri(2,4),b=ri(2,4),c=a*b;const wrongs=[a+b===c?c+2:a+b,c+1,Math.pow(a,b)===c?c+3:Math.pow(a,b)].map(e=>`x<sup>${e}</sup>`);
+   return{text:`Simplify (x<sup>${a}</sup>)<sup>${b}</sup>`,correct:`x<sup>${c}</sup>`,wrong:wrongs,
+   steps:['Power of a power: multiply the indices.',`${a} × ${b} = ${c}`,`Answer: x<sup>${c}</sup>`]};}),
+  g(2,()=>{const m=pick(['1.5','2','3.2','4.5','6','7.4']),e=ri(2,6),n=parseFloat(m)*Math.pow(10,e);
+   const correct=`${m} × 10<sup>${e}</sup>`;
+   return{text:`Write ${n.toLocaleString('en-GB')} in standard form.`,correct,
+   wrong:[`${m} × 10<sup>${e+1}</sup>`,`${m} × 10<sup>${e-1}</sup>`,`${parseFloat(m)*10} × 10<sup>${e-1}</sup>`],
+   steps:['Move the decimal point until one non-zero digit is in front.',`${n.toLocaleString('en-GB')} = ${m} with the point moved ${e} places`,`= ${m} × 10<sup>${e}</sup>`]};}),
+  g(2,()=>{const m=pick(['1.5','2','3.2','4.5','6']),e=ri(2,5),n=parseFloat(m)*Math.pow(10,e);
+   return{text:`Write ${m} × 10<sup>${e}</sup> as an ordinary number.`,correct:n,
+   wrong:[parseFloat(m)*Math.pow(10,e+1),parseFloat(m)*Math.pow(10,e-1),parseFloat(m)*Math.pow(10,e)+ (e>2?100:10)],
+   steps:[`Move the decimal point ${e} places to the right.`,`= ${n.toLocaleString('en-GB')}`]};}),
+  g(3,()=>{const pr=pick([[2,3],[2,4],[3,3],[2,2]]),m1=ri(2,4),m2=ri(2,4),ab=pr[0]*pr[1],eSum=m1+m2;
+   return{text:`Work out (${pr[0]} × 10<sup>${m1}</sup>) × (${pr[1]} × 10<sup>${m2}</sup>). Give your answer in standard form.`,
+   correct:`${ab} × 10<sup>${eSum}</sup>`,
+   wrong:[`${ab} × 10<sup>${eSum+1}</sup>`,`${ab} × 10<sup>${eSum-1}</sup>`,`${ab*10} × 10<sup>${eSum-1}</sup>`],
+   steps:[`Multiply the numbers: ${pr[0]} × ${pr[1]} = ${ab}`,`Add the powers of 10: ${m1} + ${m2} = ${eSum}`,`= ${ab} × 10<sup>${eSum}</sup>`]};}),
+  g(3,()=>{const p=pick([
+   {q:'2<sup>−2</sup>',a:'1/4',w:['−4','1/2','4']},{q:'10<sup>−3</sup>',a:'0.001',w:['−1000','0.01','−0.001']},
+   {q:'5<sup>−1</sup>',a:'1/5',w:['−5','5','−1/5']},{q:'3<sup>−2</sup>',a:'1/9',w:['−9','1/6','1/3']},
+   {q:'10<sup>−2</sup>',a:'0.01',w:['−100','0.1','−0.01']},
+  ]);return{text:`Evaluate ${p.q}`,correct:p.a,wrong:p.w,
+   steps:['A negative index means "1 over".','x<sup>−n</sup> = 1 ÷ x<sup>n</sup>',`So ${p.q} = ${p.a}`]};}),
+ ]},
+/* ---------- 7 VECTORS ---------- */
+{id:'vectors',name:'Vectors & triangle of velocities',icon:'🧭',
+ concept:['Groundspeed = TAS − headwind, or TAS + tailwind.','Perpendicular vectors: use Pythagoras for the resultant.','Wind 30° off the runway → crosswind ≈ half the wind speed.'],
+ formula:'XWC = wind × sin θ &nbsp;•&nbsp; HWC = wind × cos θ',
+ gens:[
+  g(1,()=>{const tas=pick([100,120,150,180,200]),w=pick([15,20,30,40]),head=Math.random()<.5,gs=head?tas-w:tas+w;
+   return{text:`TAS ${tas} kt, ${w} kt ${head?'headwind':'tailwind'}. Groundspeed?`,correct:gs,unit:' kt',
+   steps:[`${head?'A headwind slows you down: subtract.':'A tailwind pushes you along: add.'}`,`GS = ${tas} ${head?'−':'+'} ${w}`,`= ${gs} kt`]};}),
+  g(1,()=>{const h=pick([30,60,90,120,150,200,250,300,330]),r=h>180?h-180:h+180;
+   return{text:`You are heading ${String(h).padStart(3,'0')}°. What is the reciprocal heading?`,correct:`${String(r).padStart(3,'0')}°`,
+   wrong:shuffle([`${String((r+20)%360||360).padStart(3,'0')}°`,`${String((h+90)%360||360).padStart(3,'0')}°`,`${String((r+180+40)%360||360).padStart(3,'0')}°`]),
+   steps:['Reciprocal = ±180°.',`${h} ${h>180?'−':'+'} 180 = ${r}`,`= ${String(r).padStart(3,'0')}°`]};}),
+  g(2,()=>{const t=pick([[30,40,50],[60,80,100],[90,120,150],[50,120,130]]);
+   return{text:`Two perpendicular velocities: ${t[0]} kt and ${t[1]} kt. Magnitude of the resultant?`,correct:t[2],unit:' kt',
+   steps:['At right angles → Pythagoras.',`R² = ${t[0]}² + ${t[1]}² = ${t[0]*t[0]+t[1]*t[1]}`,`R = ${t[2]} kt`]};}),
+  g(2,()=>{const w=pick([20,30,40]),p=pick([{ang:30,f:0.5,fs:'0.5'},{ang:45,f:0.7,fs:'≈0.7'},{ang:90,f:1,fs:'1'}]),x=Math.round(w*p.f);
+   return{text:`Wind ${w} kt at ${p.ang}° off the runway. Crosswind component?`,correct:x,unit:' kt',
+   steps:[`Crosswind = wind × sin(angle off)`,`sin ${p.ang}° = ${p.fs}`,`XWC = ${w} × ${p.fs} ≈ ${x} kt`]};}),
+  g(2,()=>{const w=pick([20,30,40]),p=pick([{ang:60,f:0.5,fs:'0.5'},{ang:45,f:0.7,fs:'≈0.7'},{ang:0,f:1,fs:'1'}]),x=Math.round(w*p.f);
+   return{text:`Wind ${w} kt at ${p.ang}° off the nose. Headwind component?`,correct:x,unit:' kt',
+   steps:[`Headwind = wind × cos(angle off)`,`cos ${p.ang}° = ${p.fs}`,`HWC = ${w} × ${p.fs} ≈ ${x} kt`]};}),
+  g(3,()=>{const p=pick([
+   {q:'The wind is blowing from your left. Which way does the aircraft drift?',a:'To the right',w:['To the left','Straight ahead','Backwards'],s:['Wind pushes the aircraft the way it blows.','Wind from the left → pushed (drifts) right.']},
+   {q:'The wind is from your right. To stay on track you should head…',a:'Right, into the wind',w:['Left, away from the wind','Straight — no correction','Downwind'],s:['You always lay off drift INTO the wind.','Wind from the right → point slightly right.']},
+   {q:'In the triangle of velocities, Heading/TAS + Wind vector equals…',a:'Track and groundspeed',w:['Drift and variation','Course and altitude','Lift and drag'],s:['Air vector + wind vector = ground vector.','That resultant is your track and groundspeed.']},
+  ]);return{text:p.q,correct:p.a,wrong:p.w,steps:p.s};}),
+  g(3,()=>{const a=ri(1,6),b=ri(1,6),c=ri(1,6),d=ri(1,6);
+   return{text:`Add the vectors (${a}, ${b}) + (${c}, ${d})`,correct:`(${a+c}, ${b+d})`,
+   wrong:[`(${a+d}, ${b+c})`,`(${a*c}, ${b*d})`,`(${a+c+1}, ${b+d})`],
+   steps:['Add the components separately.',`x: ${a} + ${c} = ${a+c};  y: ${b} + ${d} = ${b+d}`,`= (${a+c}, ${b+d})`]};}),
+  g(3,()=>{const tas=pick([150,180,200]),hw=pick([30,50]),gs=tas-hw,d=gs*2;
+   return{text:`TAS ${tas} kt with a ${hw} kt headwind component. How long to fly ${d} nm?`,correct:2,unit:' h',
+   steps:[`GS = ${tas} − ${hw} = ${gs} kt`,`Time = distance ÷ GS = ${d} ÷ ${gs}`,`= 2 hours`]};}),
+ ]},
+/* ---------- 8 MECHANICS ---------- */
+{id:'mech',name:'Mechanics — forces & moments',icon:'⚙️',
+ concept:['F = ma. No resultant force → constant velocity (Newton 1).','Weight = mass × g. Use g = 10 N/kg.','Moment = force × perpendicular distance from the pivot.'],
+ formula:'F = m × a &nbsp;•&nbsp; W = m × g &nbsp;•&nbsp; M = F × d',
+ gens:[
+  g(1,()=>{const m=pick([2,5,10,20,50]),a=pick([2,3,4,5,10]),F=m*a;return{text:`Mass ${m} kg accelerates at ${a} m/s². Resultant force?`,correct:F,unit:' N',
+   steps:['F = m × a',`= ${m} × ${a}`,`= ${F} N`]};}),
+  g(1,()=>{const m=pick([5,20,50,70,800,1200]),W=m*10;return{text:`What is the weight of a ${fmt(m)} kg ${m>100?'aircraft':'flight bag'}? (g = 10 N/kg)`,correct:W,unit:' N',
+   steps:['Weight = mass × g',`= ${fmt(m)} × 10`,`= ${fmt(W)} N`]};}),
+  g(1,()=>{return{text:'Which is true about weight and mass?',correct:'Weight is a force, measured in newtons',
+   wrong:['Mass is a force, measured in newtons','Weight is measured in kilograms','They are the same thing'],
+   steps:['Mass (kg) = amount of matter — same everywhere.','Weight (N) = force of gravity on that mass: W = mg.']};}),
+  g(2,()=>{const m=pick([2,4,5,10,20]),a=pick([2,3,5]),F=m*a;return{text:`A resultant force of ${F} N acts on a mass of ${m} kg. Acceleration?`,correct:a,unit:' m/s²',
+   steps:['a = F ÷ m',`= ${F} ÷ ${m}`,`= ${a} m/s²`]};}),
+  g(2,()=>{const T=pick([2000,3000,5000]),D=pick([500,1000,1500]),m=pick([500,1000]),net=T-D,a=net/m;
+   if(!Number.isInteger(a))return{text:`Thrust 3000 N, drag 1000 N, mass 500 kg. Acceleration?`,correct:4,unit:' m/s²',
+    steps:['Resultant = thrust − drag = 3000 − 1000 = 2000 N','a = F ÷ m = 2000 ÷ 500','= 4 m/s²']};
+   return{text:`Thrust ${fmt(T)} N, drag ${fmt(D)} N, mass ${fmt(m)} kg. Acceleration?`,correct:a,unit:' m/s²',
+   steps:[`Resultant force = ${fmt(T)} − ${fmt(D)} = ${fmt(net)} N`,`a = F ÷ m = ${fmt(net)} ÷ ${fmt(m)}`,`= ${fmt(a)} m/s²`]};}),
+  g(2,()=>{const F=pick([10,20,40,50]),d=pick([0.5,2,3,4]),M=F*d;return{text:`A force of ${F} N acts ${fmt(d)} m from a pivot. Moment?`,correct:M,unit:' Nm',
+   steps:['Moment = force × distance',`= ${F} × ${fmt(d)}`,`= ${fmt(M)} Nm`]};}),
+  g(3,()=>{const F1=pick([20,30,40]),d1=pick([2,3,4]),d2=pick([1,2]),F2=F1*d1/d2;
+   return{text:`A see-saw balances. ${F1} N acts ${d1} m left of the pivot; a force F acts ${d2} m on the right. Find F.`,correct:F2,unit:' N',
+   steps:['Balanced → clockwise moment = anticlockwise moment.',`${F1} × ${d1} = F × ${d2}`,`F = ${F1*d1} ÷ ${d2} = ${fmt(F2)} N`]};}),
+  g(3,()=>{const p=pick([
+   {q:'An aircraft in cruise at constant velocity: the resultant force is…',a:'Zero',w:['Forwards','Upwards','Equal to its weight'],s:['Constant velocity → no resultant force (Newton\'s 1st law).','Thrust = drag and lift = weight.']},
+   {q:'"F = ma" is a statement of…',a:'Newton\'s 2nd law',w:['Newton\'s 1st law','Newton\'s 3rd law','The law of moments'],s:['2nd law: resultant force = mass × acceleration.']},
+   {q:'A propeller pushes air backwards; the air pushes the propeller forwards. This is…',a:'Newton\'s 3rd law',w:['Newton\'s 1st law','Newton\'s 2nd law','Bernoulli\'s principle'],s:['3rd law: every action has an equal and opposite reaction.']},
+   {q:'An object stays at rest unless acted on by a resultant force. This is…',a:'Newton\'s 1st law',w:['Newton\'s 2nd law','Newton\'s 3rd law','Hooke\'s law'],s:['1st law: inertia — no resultant force, no change in motion.']},
+  ]);return{text:p.q,correct:p.a,wrong:p.w,steps:p.s};}),
+ ]},
+/* ---------- 9 ENERGY ---------- */
+{id:'energy',name:'Work, energy, power',icon:'⚡',
+ concept:['Work = force × distance (joules).','Power = work ÷ time (watts).','KE = ½mv², GPE = mgh (g = 10).'],
+ formula:'W = F × d &nbsp;•&nbsp; P = W ÷ t &nbsp;•&nbsp; KE = ½mv²',
+ gens:[
+  g(1,()=>{const F=pick([20,50,100,200]),d=pick([2,5,10]),W=F*d;return{text:`A tug pulls with ${F} N over ${d} m. Work done?`,correct:W,unit:' J',
+   steps:['Work = force × distance',`= ${F} × ${d}`,`= ${fmt(W)} J`]};}),
+  g(1,()=>{const W=pick([1000,2000,3000,6000]),t=pick([2,5,10]),P=W/t;return{text:`${fmt(W)} J of work is done in ${t} s. Power?`,correct:P,unit:' W',
+   steps:['Power = work ÷ time',`= ${fmt(W)} ÷ ${t}`,`= ${fmt(P)} W`]};}),
+  g(2,()=>{const m=pick([2,5,10,50]),h=pick([10,20,100]),E=m*10*h;return{text:`Mass ${m} kg lifted ${h} m. Gain in GPE? (g = 10)`,correct:E,unit:' J',
+   steps:['GPE = m × g × h',`= ${m} × 10 × ${h}`,`= ${fmt(E)} J`]};}),
+  g(2,()=>{const m=pick([2,4,8,10]),v=pick([5,10,20]),E=0.5*m*v*v;return{text:`Mass ${m} kg moving at ${v} m/s. Kinetic energy?`,correct:E,unit:' J',
+   steps:['KE = ½ × m × v²',`= ½ × ${m} × ${v*v}`,`= ${fmt(E)} J`]};}),
+  g(2,()=>{const P=pick([100,200,500]),t=pick([4,10,60]),W=P*t;return{text:`A ${P} W motor runs for ${t} s. Energy transferred?`,correct:W,unit:' J',
+   steps:['Energy = power × time',`= ${P} × ${t}`,`= ${fmt(W)} J`]};}),
+  g(3,()=>{const p=pick([[5,10],[20,20],[45,30],[80,40]]);return{text:`An object falls ${p[0]} m from rest (no drag, g = 10). Impact speed?`,correct:p[1],unit:' m/s',
+   steps:['GPE lost = KE gained → v = √(2gh)',`v = √(2 × 10 × ${p[0]}) = √${20*p[0]}`,`= ${p[1]} m/s`]};}),
+  g(3,()=>{const F=pick([200,500,1000]),v=pick([10,20,50]),P=F*v;return{text:`Thrust ${fmt(F)} N at a steady ${v} m/s. Power developed?`,correct:P,unit:' W',
+   steps:['Power = force × velocity',`= ${fmt(F)} × ${v}`,`= ${fmt(P)} W`]};}),
+  g(3,()=>{const p=pick([[400,1000,40],[300,500,60],[200,800,25],[750,1000,75]]);
+   return{text:`An engine takes in ${fmt(p[1])} J and does ${fmt(p[0])} J of useful work. Efficiency?`,correct:p[2],unit:'%',
+   steps:['Efficiency = useful ÷ input × 100',`= ${fmt(p[0])} ÷ ${fmt(p[1])} × 100`,`= ${p[2]}%`]};}),
+ ]},
+/* ---------- 10 PRESSURE ---------- */
+{id:'pressure',name:'Pressure, density, gas laws',icon:'🌡️',
+ concept:['Pressure = force ÷ area. Density = mass ÷ volume.','Higher altitude → lower pressure and lower density.','Boyle: P₁V₁ = P₂V₂ (constant temperature). Kelvin = °C + 273.'],
+ formula:'P = F ÷ A &nbsp;•&nbsp; ρ = m ÷ V &nbsp;•&nbsp; P₁V₁ = P₂V₂',
+ gens:[
+  g(1,()=>{const F=pick([100,200,600,1000]),A=pick([2,4,5,10]),P=F/A;return{text:`Force ${fmt(F)} N on an area of ${A} m². Pressure?`,correct:P,unit:' Pa',
+   steps:['Pressure = force ÷ area',`= ${fmt(F)} ÷ ${A}`,`= ${fmt(P)} Pa`]};}),
+  g(1,()=>{const m=pick([20,40,100,800]),V=pick([2,4,5,10]),rho=m/V;
+   return rho===Math.round(rho)?{text:`Mass ${fmt(m)} kg in a volume of ${V} m³. Density?`,correct:rho,unit:' kg/m³',
+    steps:['Density = mass ÷ volume',`= ${fmt(m)} ÷ ${V}`,`= ${fmt(rho)} kg/m³`]}
+   :{text:`Mass 100 kg in a volume of 4 m³. Density?`,correct:25,unit:' kg/m³',
+    steps:['Density = mass ÷ volume','= 100 ÷ 4','= 25 kg/m³']};}),
+  g(2,()=>{const P=pick([50,100,200]),A=pick([2,4,5]),F=P*A;return{text:`Pressure ${P} Pa acts on ${A} m². Total force?`,correct:F,unit:' N',
+   steps:['Force = pressure × area',`= ${P} × ${A}`,`= ${fmt(F)} N`]};}),
+  g(2,()=>{const V=pick([2,5,10]),rho=800,m=rho*V;return{text:`Jet fuel has density 800 kg/m³. Mass of ${V} m³?`,correct:m,unit:' kg',
+   steps:['Mass = density × volume',`= 800 × ${V}`,`= ${fmt(m)} kg`]};}),
+  g(2,()=>{const p=pick([[0,273],[15,288],[27,300],[100,373],[-73,200]]);return{text:`Convert ${p[0]} °C to kelvin.`,correct:p[1],unit:' K',
+   steps:['K = °C + 273',`= ${p[0]} + 273`,`= ${p[1]} K`]};}),
+  g(3,()=>{const p=pick([[100,4,2,200],[200,3,6,100],[100,6,3,200],[50,8,4,100]]);
+   return{text:`A gas at ${p[0]} kPa occupies ${p[1]} L. It is compressed to ${p[2]} L at constant temperature. New pressure?`,correct:p[3],unit:' kPa',
+   steps:['Boyle\'s law: P₁V₁ = P₂V₂',`${p[0]} × ${p[1]} = P₂ × ${p[2]}`,`P₂ = ${p[0]*p[1]} ÷ ${p[2]} = ${p[3]} kPa`]};}),
+  g(3,()=>{const p=pick([
+   {q:'As an aircraft climbs, the outside air pressure…',a:'Decreases',w:['Increases','Stays the same','Doubles every 1000 ft'],s:['Less air above you pressing down → lower pressure.','Pressure and density both fall with altitude.']},
+   {q:'ISA sea-level pressure is…',a:'1013 hPa',w:['1000 hPa','913 hPa','1130 hPa'],s:['International Standard Atmosphere: 1013.25 hPa,','15 °C at sea level.']},
+   {q:'As altitude increases, air density…',a:'Decreases',w:['Increases','Stays the same','Depends only on wind'],s:['Thinner air higher up: fewer molecules per m³.','That is why performance drops at altitude.']},
+   {q:'Heating a fixed volume of gas makes its pressure…',a:'Increase',w:['Decrease','Stay the same','Fall to zero'],s:['Hotter molecules move faster and hit the walls harder.','Pressure rises with temperature at constant volume.']},
+  ]);return{text:p.q,correct:p.a,wrong:p.w,steps:p.s};}),
+  g(3,()=>{const h=pick([2,5,10]),P=1000*10*h;return{text:`Pressure due to ${h} m of water (ρ = 1000 kg/m³, g = 10)?`,correct:P,unit:' Pa',
+   steps:['P = ρ × g × h',`= 1000 × 10 × ${h}`,`= ${fmt(P)} Pa`]};}),
+ ]},
+/* ---------- 11 ELECTRICITY ---------- */
+{id:'elec',name:'Electricity — Ohm\'s law & circuits',icon:'🔋',
+ concept:['V = I × R. Cover the one you want.','Series: resistances add, current is the same everywhere.','Parallel: total resistance is less than the smallest branch.'],
+ formula:'V = I × R &nbsp;•&nbsp; P = I × V',
+ gens:[
+  g(1,()=>{const I=pick([2,3,4,5]),R=pick([2,3,5,10]),V=I*R;return{text:`Current ${I} A through ${R} Ω. Voltage across it?`,correct:V,unit:' V',
+   steps:['V = I × R',`= ${I} × ${R}`,`= ${V} V`]};}),
+  g(1,()=>{const V=pick([6,12,24]),R=pick([2,3,4,6]),I=V/R;
+   return Number.isInteger(I)?{text:`A ${V} V battery drives a ${R} Ω resistor. Current?`,correct:I,unit:' A',
+    steps:['I = V ÷ R',`= ${V} ÷ ${R}`,`= ${fmt(I)} A`]}
+   :{text:`A 12 V battery drives a 4 Ω resistor. Current?`,correct:3,unit:' A',
+    steps:['I = V ÷ R','= 12 ÷ 4','= 3 A']};}),
+  g(1,()=>{const p=pick([
+   {q:'Current is measured in…',a:'Amperes',w:['Volts','Ohms','Watts']},
+   {q:'Resistance is measured in…',a:'Ohms',w:['Amperes','Volts','Joules']},
+   {q:'In a series circuit the current is…',a:'The same at every point',w:['Biggest near the battery','Zero at the end','Shared between components']},
+  ]);return{text:p.q,correct:p.a,wrong:p.w,
+   steps:['Units: current A, voltage V, resistance Ω, power W.','Series circuits: one loop → same current everywhere.']};}),
+  g(2,()=>{const I=pick([2,3,4]),V=pick([6,12,24]),R=V/I;
+   return Number.isInteger(R)?{text:`${V} V pushes ${I} A through a component. Resistance?`,correct:R,unit:' Ω',
+    steps:['R = V ÷ I',`= ${V} ÷ ${I}`,`= ${fmt(R)} Ω`]}
+   :{text:`12 V pushes 3 A through a component. Resistance?`,correct:4,unit:' Ω',
+    steps:['R = V ÷ I','= 12 ÷ 3','= 4 Ω']};}),
+  g(2,()=>{const I=pick([2,3,5]),V=pick([10,12,24]),P=I*V;return{text:`A landing light draws ${I} A at ${V} V. Power?`,correct:P,unit:' W',
+   steps:['P = I × V',`= ${I} × ${V}`,`= ${fmt(P)} W`]};}),
+  g(2,()=>{const a=pick([2,3,4,6]),b=pick([2,3,5,10]),c=pick([0,4,6]),tot=a+b+c;
+   return{text:c?`Resistors of ${a} Ω, ${b} Ω and ${c} Ω in series. Total resistance?`:`Resistors of ${a} Ω and ${b} Ω in series. Total resistance?`,correct:tot,unit:' Ω',
+   steps:['In series, resistances simply add.',c?`${a} + ${b} + ${c} = ${tot} Ω`:`${a} + ${b} = ${tot} Ω`]};}),
+  g(3,()=>{const p=pick([[6,3,2],[12,6,4],[12,4,3],[20,5,4],[10,10,5],[8,8,4]]);
+   return{text:`${p[0]} Ω and ${p[1]} Ω in parallel. Total resistance?`,correct:p[2],unit:' Ω',
+   steps:['Two resistors in parallel: R = product ÷ sum',`= (${p[0]} × ${p[1]}) ÷ (${p[0]} + ${p[1]}) = ${p[0]*p[1]} ÷ ${p[0]+p[1]}`,`= ${p[2]} Ω`]};}),
+  g(3,()=>{const p=pick([[12,2,4],[24,4,8],[12,4,2],[24,6,6]]);const I=p[0]/(p[1]+p[2]),V1=I*p[1];
+   return{text:`A ${p[0]} V supply feeds ${p[1]} Ω and ${p[2]} Ω in series. Voltage across the ${p[1]} Ω resistor?`,correct:V1,unit:' V',
+   steps:[`Total R = ${p[1]} + ${p[2]} = ${p[1]+p[2]} Ω`,`I = V ÷ R = ${p[0]} ÷ ${p[1]+p[2]} = ${fmt(I)} A`,`V = I × R = ${fmt(I)} × ${p[1]} = ${fmt(V1)} V`]};}),
+  g(2,()=>{const I=pick([2,3]),R=pick([5,10]),P=I*I*R;return{text:`Current ${I} A through ${R} Ω. Power dissipated? (P = I²R)`,correct:P,unit:' W',
+   steps:['P = I² × R',`= ${I*I} × ${R}`,`= ${fmt(P)} W`]};}),
+ ]},
+/* ---------- 12 GRAPHS ---------- */
+{id:'graphs',name:'Graphs & interpolation',icon:'📈',
+ concept:['Gradient = rise ÷ run = change in y ÷ change in x.','Distance–time: gradient = speed. Speed–time: gradient = acceleration, area = distance.','Interpolate: value between two table entries — go proportionally.'],
+ formula:'m = (y₂ − y₁) ÷ (x₂ − x₁)',
+ gens:[
+  g(1,()=>{const m=pick([1,2,3,5]),x1=ri(0,3),dx=pick([2,4,5]),c=ri(0,5),y1=m*x1+c,x2=x1+dx,y2=m*x2+c;
+   return{text:`Find the gradient of the line through (${x1}, ${y1}) and (${x2}, ${y2}).`,correct:m,
+   steps:['Gradient = change in y ÷ change in x',`= (${y2} − ${y1}) ÷ (${x2} − ${x1}) = ${y2-y1} ÷ ${dx}`,`= ${m}`]};}),
+  g(1,()=>{const m=ri(2,6),c=ri(1,9),which=Math.random()<.5;
+   return which?{text:`For the line y = ${m}x + ${c}, what is the gradient?`,correct:m,
+    steps:['In y = mx + c, m (the number with x) is the gradient.',`Gradient = ${m}`]}
+   :{text:`For the line y = ${m}x + ${c}, what is the y-intercept?`,correct:c,
+    steps:['In y = mx + c, c is where the line crosses the y-axis.',`Intercept = ${c}`]};}),
+  g(2,()=>{const s=pick([60,90,120,150]),t=ri(2,4),d=s*t;
+   return{text:`A distance–time graph rises steadily from 0 to ${d} nm over ${t} hours. What speed does it show?`,correct:s,unit:' kt',
+   steps:['Speed = gradient of a distance–time graph.',`= ${d} ÷ ${t}`,`= ${s} kt`]};}),
+  g(2,()=>{return{text:'On a distance–time graph, a horizontal (flat) section means…',correct:'The object is stationary',
+   wrong:['Constant speed','Accelerating','Moving backwards'],
+   steps:['Flat line → distance not changing → not moving.','A straight slope = constant speed; a curve = changing speed.']};}),
+  g(2,()=>{const v=pick([20,30,40]),t=ri(2,8),a=pick([['area','distance travelled'],['gradient','acceleration']]);
+   const isArea=a[0]==='area';const d=v*t;
+   return isArea?{text:`A speed–time graph shows a constant ${v} m/s for ${t} s. What is the distance travelled (area under the graph)?`,correct:d,unit:' m',
+    steps:['Distance = area under a speed–time graph.',`= ${v} × ${t}`,`= ${fmt(d)} m`]}
+   :{text:'On a speed–time graph, the gradient represents…',correct:'Acceleration',wrong:['Distance','Force','Momentum'],
+    steps:['Gradient = change in speed ÷ time = acceleration.','Area under the graph = distance.']};}),
+  g(3,()=>{const alts=pick([[2000,4000],[4000,6000],[6000,8000]]),v1=pick([18,20,22,30]),v2=v1+pick([2,4,6]),mid=(v1+v2)/2,midAlt=(alts[0]+alts[1])/2;
+   return{text:`Performance table: fuel flow ${v1} L/h at ${fmt(alts[0])} ft and ${v2} L/h at ${fmt(alts[1])} ft. Estimate the fuel flow at ${fmt(midAlt)} ft.`,correct:mid,unit:' L/h',
+   steps:[`${fmt(midAlt)} ft is exactly halfway between ${fmt(alts[0])} and ${fmt(alts[1])} ft.`,`So take the halfway value: (${v1} + ${v2}) ÷ 2`,`= ${fmt(mid)} L/h`]};}),
+  g(3,()=>{const m=pick([2,3,5]),c=ri(1,8),x=ri(2,9),y=m*x+c;
+   return{text:`The line y = ${m}x + ${c} passes through y = ${y}. Find x.`,correct:x,
+   steps:[`${y} = ${m}x + ${c}`,`Subtract ${c}: ${m}x = ${y-c}`,`x = ${y-c} ÷ ${m} = ${x}`]};}),
+ ]},
+/* ---------- 13 WAVES HEAT MAGNETISM ---------- */
+{id:'waves',name:'Heat, waves, magnetism',icon:'📡',
+ concept:['Wave speed = frequency × wavelength.','Heat energy: E = mcΔT. Conduction (solids), convection (fluids), radiation (no medium needed).','Like magnetic poles repel; unlike poles attract.'],
+ formula:'v = f × λ &nbsp;•&nbsp; E = mcΔT',
+ gens:[
+  g(1,()=>{const f=pick([2,5,10,50]),l=pick([2,3,4,10]),v=f*l;return{text:`A wave has frequency ${f} Hz and wavelength ${l} m. Wave speed?`,correct:v,unit:' m/s',
+   steps:['v = f × λ',`= ${f} × ${l}`,`= ${fmt(v)} m/s`]};}),
+  g(2,()=>{const f=pick([2,5,10,20]),l=pick([2,3,5,10]),v=f*l,askF=Math.random()<.5;
+   return askF?{text:`A wave travels at ${fmt(v)} m/s with wavelength ${l} m. Frequency?`,correct:f,unit:' Hz',
+    steps:['f = v ÷ λ',`= ${fmt(v)} ÷ ${l}`,`= ${f} Hz`]}
+   :{text:`A wave travels at ${fmt(v)} m/s with frequency ${f} Hz. Wavelength?`,correct:l,unit:' m',
+    steps:['λ = v ÷ f',`= ${fmt(v)} ÷ ${f}`,`= ${l} m`]};}),
+  g(2,()=>{const f=pick([2,4,5,10,50,100]),T=1/f;return{text:`A wave has frequency ${f} Hz. What is its period?`,correct:T,unit:' s',
+   steps:['Period T = 1 ÷ frequency',`= 1 ÷ ${f}`,`= ${fmt(T)} s`]};}),
+  g(2,()=>{const m=pick([2,3]),c=pick([500,1000]),dT=pick([5,10,20]),E=m*c*dT;
+   return{text:`Heat ${m} kg of a material (c = ${c} J/kg°C) by ${dT} °C. Energy needed?`,correct:E,unit:' J',
+   steps:['E = m × c × ΔT',`= ${m} × ${c} × ${dT}`,`= ${fmt(E)} J`]};}),
+  g(3,()=>{const p=pick([[100,3],[150,2],[75,4],[300,1],[50,6]]);
+   return{text:`A radio wave has frequency ${p[0]} MHz. Wavelength? (c = 3 × 10⁸ m/s)`,correct:p[1],unit:' m',
+   steps:['λ = c ÷ f',`= (3 × 10⁸) ÷ (${p[0]} × 10⁶) = 300 ÷ ${p[0]}`,`= ${p[1]} m`]};}),
+  g(3,()=>{const p=pick([
+   {q:'Heat travelling along a metal spanner is…',a:'Conduction',w:['Convection','Radiation','Insulation'],s:['Conduction: vibrations passed particle-to-particle in solids.','Metals conduct best (free electrons).']},
+   {q:'A cabin heater warming the air, which then circulates, is…',a:'Convection',w:['Conduction','Radiation','Evaporation'],s:['Convection: warm fluid rises, cool fluid sinks — a current.','Only happens in liquids and gases.']},
+   {q:'Heat reaching Earth from the Sun travels by…',a:'Radiation',w:['Conduction','Convection','Wind'],s:['Radiation is the only transfer that works through a vacuum.','It travels as infrared electromagnetic waves.']},
+   {q:'Which CANNOT travel through a vacuum?',a:'Sound waves',w:['Radio waves','Light','Infrared'],s:['Sound needs a medium (particles) to travel.','Electromagnetic waves need nothing.']},
+  ]);return{text:p.q,correct:p.a,wrong:p.w,steps:p.s};}),
+  g(3,()=>{const p=pick([
+   {q:'Two north magnetic poles brought together will…',a:'Repel',w:['Attract','Do nothing','Cancel out'],s:['Like poles repel; unlike poles attract.']},
+   {q:'A freely suspended compass needle points…',a:'To magnetic north',w:['To true north exactly','East','Wherever it was left'],s:['The needle aligns with Earth\'s magnetic field.','The difference from true north is called variation.']},
+   {q:'To make an electromagnet stronger you can…',a:'Add more turns of wire',w:['Use thinner string','Reduce the current','Remove the iron core'],s:['More turns, more current, or an iron core','all strengthen an electromagnet.']},
+   {q:'A current is induced in a coil when the magnetic field through it…',a:'Changes',w:['Is steady','Is zero','Points north'],s:['Electromagnetic induction needs a CHANGING field','(move the magnet or vary the current).']},
+  ]);return{text:p.q,correct:p.a,wrong:p.w,steps:p.s};}),
+ ]},
+];
+</script>
+
+<script>
+/* ================= state ================= */
+const KEY='atplPrepV1';
+let S;
+try{S=JSON.parse(localStorage.getItem(KEY))||null;}catch(e){S=null;}
+if(!S)S={topics:{},best:0,answered:0,right:0,warm:{},tests:[]};
+const save=()=>localStorage.setItem(KEY,JSON.stringify(S));
+const tp=id=>(S.topics[id]=S.topics[id]||{c:0,a:0});
+const MASTER=12;
+const TEST_DATE=new Date(2026,7,9); // 9 Aug 2026
+
+/* ================= dom helpers ================= */
+const $=s=>document.querySelector(s);
+const show=id=>{document.querySelectorAll('.screen').forEach(e=>e.classList.remove('on'));$(id).classList.add('on');window.scrollTo(0,0);};
+let toastTimer=null;
+function toast(msg){const t=$('#toast');t.innerHTML=msg;t.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),1800);}
+
+/* ================= home ================= */
+function todayStr(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function renderHome(){
+  const days=Math.ceil((TEST_DATE-new Date())/86400000);
+  $('#daysChip').textContent=days>1?`${days} days to test ✈️`:days===1?'Test tomorrow!':days===0?'Test day — good luck!':'Test: 9 Aug';
+  $('#stAnswered').textContent=S.answered;
+  $('#stAcc').textContent=S.answered?Math.round(100*S.right/S.answered)+'%':'—';
+  $('#stStreak').textContent=S.best;
+  const mastered=TOPICS.filter(t=>tp(t.id).c>=MASTER).length;
+  $('#stMastered').textContent=mastered+'/13';
+  $('#warmDone').style.display=S.warm[todayStr()]!=null?'inline':'none';
+  const lt=S.tests[S.tests.length-1];
+  if(lt){$('#lastTest').style.display='inline-block';$('#lastTest').textContent=`last: ${lt.score}/20`;}
+  const list=$('#topicList');list.innerHTML='';
+  TOPICS.forEach(t=>{
+    const p=tp(t.id),done=p.c>=MASTER,pct=Math.min(100,Math.round(100*p.c/MASTER));
+    const b=document.createElement('button');b.className='topic';
+    b.innerHTML=`<span class="ic">${t.icon}</span>
+      <span class="tmain"><span class="tname">${t.name}</span>
+      <span class="bar ${done?'green':''}"><i style="width:${pct}%"></i></span></span>
+      <span class="tick ${done?'done':'todo'}">${done?'✔':'○'}</span>`;
+    b.onclick=()=>openConcept(t.id);
+    list.appendChild(b);
+  });
+}
+
+/* ================= quiz engine ================= */
+let Q={mode:null,topic:null,queue:[],idx:0,right:0,asked:0,streak:0,gen:null,cur:null,timer:null,timeLeft:0,answers:[]};
+
+function makeQ(topic,genObj){
+  const q=genObj.f();
+  q.topicId=topic.id;q.gen=genObj;
+  let opts=[{label:fmt(q.correct)+(q.unit||''),ok:true}];
+  const wrongs=q.wrong?q.wrong.slice(0,3):distract(q.correct);
+  const seen=new Set([opts[0].label]);
+  wrongs.forEach(w=>{const lab=(typeof w==='number'?fmt(w):String(w))+(q.unit&&typeof w==='number'?q.unit:(q.unit&&!q.wrong?q.unit:''));
+    if(!seen.has(lab)){seen.add(lab);opts.push({label:lab,ok:false});}});
+  q.opts=shuffle(opts);
+  return q;
+}
+function genFor(topic,tier){
+  let pool=topic.gens.filter(g=>g.d===tier);
+  if(tier===2&&!pool.length)pool=topic.gens.filter(g=>g.d<=2);
+  if(!pool.length)pool=topic.gens;
+  return pick(pool);
+}
+function practiceNext(similar){
+  const topic=TOPICS.find(t=>t.id===Q.topic);
+  const k=Q.asked;
+  const tier=k<3?1:k<7?2:3;
+  const genObj=similar&&Q.gen?Q.gen:genFor(topic,tier);
+  Q.cur=makeQ(topic,genObj);Q.gen=genObj;
+  renderQ();
+}
+function queueNext(){
+  if(Q.idx>=Q.queue.length){finishSession();return;}
+  Q.cur=Q.queue[Q.idx];Q.gen=Q.cur.gen;
+  renderQ();
+}
+function renderQ(){
+  const q=Q.cur;
+  $('#qText').innerHTML=q.text;
+  const box=$('#qOpts');box.innerHTML='';
+  q.opts.forEach((o,i)=>{
+    const b=document.createElement('button');b.className='opt';b.innerHTML=o.label;
+    b.onclick=()=>answer(i);
+    box.appendChild(b);
+  });
+  $('#qFeed').innerHTML='';
+  if(Q.mode==='practice'){
+    const p=tp(Q.topic);
+    $('#qBar').style.width=Math.min(100,Math.round(100*p.c/MASTER))+'%';
+    $('#qTitle').textContent=TOPICS.find(t=>t.id===Q.topic).name;
+  }else{
+    $('#qBar').style.width=Math.round(100*Q.idx/Q.queue.length)+'%';
+    $('#qTitle').textContent=(Q.mode==='warm'?'Warm-up':'Test')+`  ·  Q${Q.idx+1}/${Q.queue.length}`;
+  }
+  $('#qRight').innerHTML=Q.mode==='test'?`<span class="timer" id="tDisp"></span>`:`🔥 ${Q.streak}`;
+  if(Q.mode==='test')updateTimerDisp();
+}
+function answer(i){
+  const q=Q.cur,ok=q.opts[i].ok;
+  document.querySelectorAll('.opt').forEach((b,j)=>{
+    b.disabled=true;
+    if(Q.mode!=='test'){
+      if(q.opts[j].ok)b.classList.add('right');
+      else if(j===i&&!ok)b.classList.add('wrong');
+    }
+  });
+  if(Q.mode==='test'){
+    Q.answers.push({topicId:q.topicId,ok});
+    Q.idx++;setTimeout(queueNext,180);
+    return;
+  }
+  /* practice & warm-up: record stats */
+  const p=tp(q.topicId);
+  p.a++;S.answered++;
+  const wasMastered=p.c>=MASTER;
+  if(ok){
+    p.c++;S.right++;Q.right++;Q.streak++;
+    if(Q.streak>S.best)S.best=Q.streak;
+    if(!wasMastered&&p.c>=MASTER)setTimeout(()=>toast(`✔ ${TOPICS.find(t=>t.id===q.topicId).name} mastered!`),750);
+    else if(Q.streak>0&&Q.streak%5===0)toast(`🔥 ${Q.streak} in a row!`);
+  }else{
+    Q.streak=0;
+  }
+  save();
+  Q.asked++;
+  if(ok){
+    $('#qFeed').innerHTML=`<div class="feedback good">✔ Correct!</div>`;
+    $('#qRight').innerHTML=`🔥 ${Q.streak}`;
+    if(Q.mode==='practice'){const pp=tp(Q.topic);$('#qBar').style.width=Math.min(100,Math.round(100*pp.c/MASTER))+'%';}
+    setTimeout(()=>{if(Q.mode==='practice')practiceNext(false);else{Q.idx++;queueNext();}},800);
+  }else{
+    let html=`<div class="feedback bad">✘ Not quite — here's the working:</div>
+      <div class="working"><h4>Step by step</h4><ol>${q.steps.map(s=>`<li>${s}</li>`).join('')}</ol></div>`;
+    if(Q.mode==='practice'){
+      html+=`<div class="rowbtns"><button class="btn" id="bSim">Try a similar one</button>
+             <button class="btn ghost" id="bNext">Next question</button></div>`;
+    }else{
+      html+=`<button class="btn" id="bNext">Continue ➜</button>`;
+    }
+    $('#qFeed').innerHTML=html;
+    $('#qRight').innerHTML=`🔥 0`;
+    const sim=$('#bSim');if(sim)sim.onclick=()=>{Q.asked--;practiceNext(true);}; /* similar q doesn't skip the ramp */
+    $('#bNext').onclick=()=>{if(Q.mode==='practice')practiceNext(false);else{Q.idx++;queueNext();}};
+  }
+}
+
+/* ================= concept / practice ================= */
+function openConcept(id){
+  const t=TOPICS.find(x=>x.id===id);
+  $('#cTitle').textContent='Concept';
+  $('#cName').textContent=t.icon+' '+t.name;
+  $('#cLines').innerHTML=t.concept.map(l=>`<li>${l}</li>`).join('');
+  $('#cFormula').innerHTML=t.formula;
+  $('#cStart').onclick=()=>startPractice(id);
+  show('#scr-concept');
+}
+function startPractice(id){
+  Q={mode:'practice',topic:id,queue:[],idx:0,right:0,asked:0,streak:0,gen:null,cur:null,timer:null,timeLeft:0,answers:[]};
+  show('#scr-quiz');
+  practiceNext(false);
+}
+
+/* ================= warm-up ================= */
+function startWarm(){
+  let covered=TOPICS.filter(t=>tp(t.id).a>0);
+  if(covered.length<2)covered=TOPICS.slice(0,3);
+  const queue=[];
+  for(let i=0;i<10;i++){
+    const t=covered[i%covered.length];
+    const tier=Math.random()<.6?1:2;
+    queue.push(makeQ(t,genFor(t,tier)));
+  }
+  Q={mode:'warm',topic:null,queue:shuffle(queue),idx:0,right:0,asked:0,streak:0,gen:null,cur:null,timer:null,timeLeft:0,answers:[]};
+  show('#scr-quiz');
+  queueNext();
+}
+
+/* ================= test mode ================= */
+function startTest(){
+  const order=shuffle(TOPICS.concat(TOPICS)).slice(0,20);
+  const queue=order.map(t=>makeQ(t,pick(t.gens)));
+  Q={mode:'test',topic:null,queue,idx:0,right:0,asked:0,streak:0,gen:null,cur:null,timer:null,timeLeft:40*60,answers:[]};
+  show('#scr-quiz');
+  Q.timer=setInterval(()=>{
+    Q.timeLeft--;updateTimerDisp();
+    if(Q.timeLeft<=0){clearInterval(Q.timer);finishSession(true);}
+  },1000);
+  queueNext();
+}
+function updateTimerDisp(){
+  const d=$('#tDisp');if(!d)return;
+  const m=Math.floor(Q.timeLeft/60),s=Q.timeLeft%60;
+  d.textContent=`⏱ ${m}:${String(s).padStart(2,'0')}`;
+  d.classList.toggle('low',Q.timeLeft<300);
+}
+
+/* ================= finishing ================= */
+function finishSession(timedOut){
+  if(Q.timer){clearInterval(Q.timer);Q.timer=null;}
+  if(Q.mode==='warm'){
+    S.warm[todayStr()]=Q.right;save();
+    $('#rTitle').textContent='Warm-up done';
+    $('#rScore').textContent=`${Q.right}/10`;
+    $('#rSub').textContent=Q.right>=8?'Sharp! ✈️':Q.right>=5?'Solid — keep it up.':'Review the weak ones below in practice.';
+    $('#rBreakCard').style.display='none';
+    $('#rAgain').textContent='Back to topics';
+    $('#rAgain').onclick=()=>{renderHome();show('#scr-home');};
+    show('#scr-results');
+  }else if(Q.mode==='test'){
+    /* unanswered count as wrong */
+    while(Q.answers.length<Q.queue.length){
+      Q.answers.push({topicId:Q.queue[Q.answers.length].topicId,ok:false});
+    }
+    const score=Q.answers.filter(a=>a.ok).length;
+    /* update topic stats from test too */
+    Q.answers.forEach(a=>{const p=tp(a.topicId);p.a++;S.answered++;if(a.ok){p.c++;S.right++;}});
+    const br={};
+    Q.answers.forEach(a=>{br[a.topicId]=br[a.topicId]||{c:0,a:0};br[a.topicId].a++;if(a.ok)br[a.topicId].c++;});
+    S.tests.push({date:todayStr(),score});save();
+    $('#rTitle').textContent='Test result';
+    $('#rScore').textContent=`${score}/20`;
+    const pct=Math.round(score*5);
+    $('#rSub').textContent=(timedOut?'⏱ Time ran out. ':'')+(pct>=80?`${pct}% — excellent, test-ready form.`:pct>=60?`${pct}% — close. Hit the weak topics below.`:`${pct}% — focus practice on the red topics.`);
+    $('#rBreakCard').style.display='block';
+    const rows=$('#rRows');rows.innerHTML='';
+    Object.keys(br).forEach(id=>{
+      const t=TOPICS.find(x=>x.id===id),b=br[id],weak=b.c/b.a<0.6;
+      const div=document.createElement('div');div.className='trow';
+      div.innerHTML=`<span>${t.icon}</span><span class="n">${t.name}${weak?' <span class="weak">WEAK</span>':''}</span>
+        <span class="sc">${b.c}/${b.a}</span>`;
+      const go=document.createElement('button');go.className='go';go.textContent='Practise';
+      go.onclick=()=>openConcept(id);
+      div.appendChild(go);
+      rows.appendChild(div);
+    });
+    $('#rAgain').textContent='Take another test';
+    $('#rAgain').onclick=startTest;
+    show('#scr-results');
+  }
+}
+
+/* ================= wiring ================= */
+$('#btnWarm').onclick=startWarm;
+$('#btnTest').onclick=startTest;
+$('#cBack').onclick=()=>{renderHome();show('#scr-home');};
+$('#qBack').onclick=()=>{
+  if(Q.mode==='test'&&Q.idx<Q.queue.length){
+    if(!confirm('Leave the test? Your attempt will be discarded.'))return;
+    if(Q.timer){clearInterval(Q.timer);Q.timer=null;}
+  }
+  renderHome();show('#scr-home');
+};
+$('#rBack').onclick=()=>{renderHome();show('#scr-home');};
+$('#btnReset').onclick=()=>{
+  if(confirm('Reset ALL progress? This cannot be undone.')){
+    S={topics:{},best:0,answered:0,right:0,warm:{},tests:[]};save();renderHome();toast('Progress reset');
+  }
+};
+renderHome();
+</script>
+</body>
+</html>
