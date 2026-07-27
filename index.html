@@ -189,6 +189,33 @@ details.raw p{white-space:pre-wrap; margin:8px 0 0;}
 .fld textarea{min-height:84px; resize:vertical;}
 .fld input:focus,.fld textarea:focus{outline:none; border-color:var(--gold);}
 .fld .hint{font-size:.75rem; color:#42598a; margin-top:4px;}
+/* exam guide */
+.factgrid{display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:4px;}
+.fact{background:#0c1c3a; border:1px solid var(--line); border-radius:12px; padding:10px; text-align:center;}
+.fact b{display:block; font-size:1.15rem; color:var(--gold2);}
+.fact small{color:var(--dim); font-size:.72rem;}
+.chk{
+  display:flex; align-items:center; gap:10px; width:100%;
+  background:var(--card); border:1px solid var(--line); border-radius:12px;
+  padding:11px 12px; margin-bottom:8px; cursor:pointer; color:var(--ink);
+  text-align:left; font-size:.92rem; touch-action:manipulation;
+}
+.chk:active{background:var(--card2);}
+.chk .box{
+  width:26px; height:26px; border-radius:8px; border:2px solid #3a5687; flex:none;
+  display:flex; align-items:center; justify-content:center; font-weight:900; color:#06220f; font-size:.95rem;
+}
+.chk.on .box{background:var(--green); border-color:var(--green);}
+.chk .lab{flex:1;}
+.chk.on .lab{color:var(--dim); text-decoration:line-through;}
+.chk .jump{
+  background:var(--card2); border:1px solid var(--line); color:var(--gold2);
+  border-radius:9px; padding:6px 10px; font-size:.75rem; font-weight:800; cursor:pointer; flex:none;
+}
+.readlink{
+  display:block; background:#0d2f4d; border:1px solid #1d5c8a; color:#7cc7ff;
+  border-radius:12px; padding:12px 14px; font-weight:700; text-decoration:none; font-size:.92rem;
+}
 .foot{
   text-align:center; color:#42598a; font-size:.78rem; margin-top:22px;
 }
@@ -225,6 +252,12 @@ sup{font-size:.72em;}
       <h3>⏱️ Mock exam <span class="pill" id="lastTest" style="display:none"></span></h3>
       <p>The real paper format: 30 questions (⅔ maths, ⅓ physics), 60 minutes, 75% to pass. Calculator allowed — just like the real thing.</p>
       <button class="btn ghost" id="btnTest">Start mock exam</button>
+    </div>
+
+    <div class="card">
+      <h3>📋 Exam guide <span class="pill" id="guideCount"></span></h3>
+      <p>The official Stapleford brief: paper format, catch-out topics, and a tick-off revision checklist.</p>
+      <button class="btn ghost" id="btnGuide">Open exam guide</button>
     </div>
 
     <div class="card">
@@ -287,6 +320,48 @@ sup{font-size:.72em;}
       <div id="rRows"></div>
     </div>
     <button class="btn" id="rAgain">Go again</button>
+  </div>
+
+  <!-- ============ EXAM GUIDE ============ -->
+  <div class="screen" id="scr-guide">
+    <div class="qhead">
+      <button class="back" id="gBack">‹ Home</button>
+      <div class="mid">📋 Exam guide</div>
+      <div style="width:64px"></div>
+    </div>
+
+    <div class="card">
+      <h3>The paper <span class="pill">Stapleford ATPL(A) M+P</span></h3>
+      <div class="factgrid">
+        <div class="fact"><b>30</b><small>multiple-choice questions</small></div>
+        <div class="fact"><b>60 min</b><small>time allowed</small></div>
+        <div class="fact"><b>75%</b><small>pass mark (23/30)</small></div>
+        <div class="fact"><b>⅔ + ⅓</b><small>maths + physics split</small></div>
+      </div>
+      <p style="margin:10px 0 0;">Calculator <b style="color:var(--green)">allowed</b> · every question worth 1 mark · generic school-style questions, some with an aviation flavour · <b style="color:var(--gold2)">must be passed before the ATPL course starts</b>. Level: GCSE up to basic A-Level physics.</p>
+    </div>
+
+    <div class="card">
+      <h3>⚠️ Catches students out most</h3>
+      <div class="lsec work" style="margin-top:8px;"><h5>Maths</h5><ul>
+        <li>Manipulation of equations</li><li>Proportionality</li><li>Trigonometry</li>
+      </ul></div>
+      <div class="lsec work"><h5>Physics</h5><ul>
+        <li>Gyroscopes</li><li>Behaviour of gases</li>
+        <li>Not all calculation — expect fact-checking questions too</li>
+      </ul></div>
+    </div>
+
+    <div class="card">
+      <h3>📖 Recommended reading</h3>
+      <p>Stapleford recommend this free ebook before the two-day refresher course:</p>
+      <a class="readlink" href="https://books.apple.com/gb/book/maths-and-physics-for-pilots/id592113679" target="_blank" rel="noopener">PadPilot — Maths and Physics for ATPL (free, Apple Books) ↗</a>
+      <p style="margin:10px 0 0;">Any GCSE / A-Level revision books or materials also help.</p>
+    </div>
+
+    <h3 style="margin:18px 4px 10px;">Revision checklist <span class="pill" id="gProg"></span></h3>
+    <div class="bar" style="margin:0 4px 12px;"><i id="gBar" style="width:0%"></i></div>
+    <div id="guideList"></div>
   </div>
 
   <!-- ============ LESSON LOGBOOK ============ -->
@@ -716,8 +791,11 @@ const TOPICS=[
    {q:'In the triangle of velocities, Heading/TAS + Wind vector equals…',a:'Track and groundspeed',w:['Drift and variation','Course and altitude','Lift and drag'],s:['Air vector + wind vector = ground vector.','That resultant is your track and groundspeed.']},
   ]);return{text:p.q,correct:p.a,wrong:p.w,steps:p.s};}),
   g(3,()=>{const a=ri(1,6),b=ri(1,6),c=ri(1,6),d=ri(1,6);
-   return{text:`Add the vectors (${a}, ${b}) + (${c}, ${d})`,correct:`(${a+c}, ${b+d})`,
-   wrong:[`(${a+d}, ${b+c})`,`(${a*c}, ${b*d})`,`(${a+c+1}, ${b+d})`],
+   const cor=`(${a+c}, ${b+d})`;
+   const cands=[[a+d,b+c],[a*c,b*d],[a+c+1,b+d],[a+c,b+d+1],[a+c-1,b+d],[a+c+1,b+d+1]]
+     .map(v=>`(${v[0]}, ${v[1]})`).filter((v,i,arr)=>v!==cor&&arr.indexOf(v)===i).slice(0,3);
+   return{text:`Add the vectors (${a}, ${b}) + (${c}, ${d})`,correct:cor,
+   wrong:cands,
    steps:['Add the components separately.',`x: ${a} + ${c} = ${a+c};  y: ${b} + ${d} = ${b+d}`,`= (${a+c}, ${b+d})`]};}),
   g(3,()=>{const tas=pick([150,180,200]),hw=pick([30,50]),gs=tas-hw,d=gs*2;
    return{text:`TAS ${tas} kt with a ${hw} kt headwind component. How long to fly ${d} nm?`,correct:2,unit:' h',
@@ -1005,6 +1083,7 @@ function renderHome(){
   $('#stMastered').textContent=mastered+'/'+TOPICS.length;
   $('#warmDone').style.display=S.warm[todayStr()]!=null?'inline':'none';
   $('#lessonCount').textContent=(S.lessons||[]).length+' logged';
+  $('#guideCount').textContent=`${Object.values(S.guide||{}).filter(Boolean).length}/${GUIDE.maths.length+GUIDE.phys.length} ticked`;
   const lt=S.tests[S.tests.length-1];
   if(lt){$('#lastTest').style.display='inline-block';$('#lastTest').textContent=`last: ${lt.score}/${lt.total||20}`;}
   const list=$('#topicList');list.innerHTML='';
@@ -1241,6 +1320,70 @@ $('#qBack').onclick=()=>{
   renderHome();show('#scr-home');
 };
 $('#rBack').onclick=()=>{renderHome();show('#scr-home');};
+/* ================= exam guide (official Stapleford topic list) ================= */
+const GUIDE={
+ maths:[
+  ['Order of operations (BIDMAS)','bidmas'],
+  ['Basic operations: add, subtract, multiply, divide','bidmas'],
+  ['Index rules & roots (powers up to 3–4, mostly squares)','indices'],
+  ['Standard form & SI prefixes (milli, micro, nano; kilo, mega, giga)','indices'],
+  ['Basic inequalities — greater than / less than','bidmas'],
+  ['Basic algebraic rules & substitution','bidmas'],
+  ['Rearranging equations to change the subject (no quadratics)','rearr'],
+  ['Proportionality & inverse proportionality, including powers','prop'],
+  ['Fractions / decimals / percentages','frac'],
+  ['Percentage increase & decrease as multiplier factors (runway performance)','frac'],
+  ['Right-angled trigonometry: sin, cos, tan & their inverses','trig'],
+  ['Pythagoras\' theorem','trig'],
+ ],
+ phys:[
+  ['SI units',null],
+  ['Scalars vs vectors','mech'],
+  ['Speed, distance, time','sdt'],
+  ['Displacement, velocity & acceleration','mech'],
+  ['Free-body force diagrams & resolving forces','vectors'],
+  ['Vector addition/subtraction & components (A to C via B)','vectors'],
+  ['Inertia, mass & momentum (incl. conservation)','mech'],
+  ['Balanced & unbalanced forces; Newton\'s 3 laws','mech'],
+  ['Gravitational force, weight & terminal velocity','mech'],
+  ['Energy: KE, PE & other forms; conservation & efficiency','energy'],
+  ['Work done & power (W ÷ t, and force × velocity)','energy'],
+  ['Heat & temperature, including the Kelvin scale','pressure'],
+  ['ISA atmosphere: composition, sea-level values, trends; humidity','pressure'],
+  ['The 3 gas laws & combined law (Boyle, Charles, Gay-Lussac)','pressure'],
+  ['Gyroscopes: rigidity, precession, gimbals, wander','gyro'],
+ ],
+};
+if(!S.guide)S.guide={};
+const guideTotal=GUIDE.maths.length+GUIDE.phys.length;
+const guideDone=()=>Object.values(S.guide).filter(Boolean).length;
+function renderGuide(){
+  const list=$('#guideList');list.innerHTML='';
+  const addSec=(title,items,prefix)=>{
+    const h=document.createElement('h3');
+    h.style.cssText='margin:14px 4px 10px;font-size:.95rem;color:var(--gold2);';
+    h.textContent=title;
+    list.appendChild(h);
+    items.forEach((it,i)=>{
+      const key=prefix+i,on=!!S.guide[key];
+      const b=document.createElement('button');b.className='chk'+(on?' on':'');
+      b.innerHTML=`<span class="box">${on?'✔':''}</span><span class="lab">${it[0]}</span>`+
+        (it[1]?`<span class="jump" data-t="${it[1]}">Practise</span>`:'');
+      b.onclick=()=>{S.guide[key]=!S.guide[key];save();renderGuide();};
+      const j=b.querySelector('.jump');
+      if(j)j.onclick=e=>{e.stopPropagation();openConcept(it[1]);};
+      list.appendChild(b);
+    });
+  };
+  addSec('Mathematics — ⅔ of the paper',GUIDE.maths,'m');
+  addSec('Physics — ⅓ of the paper',GUIDE.phys,'p');
+  const d=guideDone();
+  $('#gProg').textContent=`${d}/${guideTotal} ticked`;
+  $('#gBar').style.width=Math.round(100*d/guideTotal)+'%';
+}
+$('#btnGuide').onclick=()=>{renderGuide();show('#scr-guide');};
+$('#gBack').onclick=()=>{renderHome();show('#scr-home');};
+
 /* ================= lesson logbook ================= */
 const SEED_LESSON={id:1,date:'2026-07-27',title:'Circuits at Headcorn',instructor:'Bill Pickard',aircraft:'',
  exercises:'Ex 12 & 13 — circuits, approach & landing',hours:'',
@@ -1365,7 +1508,7 @@ $('#lfBack').onclick=()=>{editingId=null;show('#scr-lessons');};
 
 $('#btnReset').onclick=()=>{
   if(confirm('Reset ALL question progress? (Your lesson logbook is kept.) This cannot be undone.')){
-    S={topics:{},best:0,answered:0,right:0,warm:{},tests:[],lessons:S.lessons||[]};save();renderHome();toast('Progress reset');
+    S={topics:{},best:0,answered:0,right:0,warm:{},tests:[],lessons:S.lessons||[],guide:{}};save();renderHome();toast('Progress reset');
   }
 };
 renderHome();
