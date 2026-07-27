@@ -212,7 +212,7 @@ sup{font-size:.72em;}
       <div class="stat"><b id="stAnswered">0</b><small>answered</small></div>
       <div class="stat"><b id="stAcc">—</b><small>accuracy</small></div>
       <div class="stat"><b id="stStreak">0</b><small>best streak 🔥</small></div>
-      <div class="stat"><b id="stMastered">0/13</b><small>mastered</small></div>
+      <div class="stat"><b id="stMastered">—</b><small>mastered</small></div>
     </div>
 
     <div class="card">
@@ -222,9 +222,9 @@ sup{font-size:.72em;}
     </div>
 
     <div class="card">
-      <h3>⏱️ Test mode <span class="pill" id="lastTest" style="display:none"></span></h3>
-      <p>20 random questions, 40-minute timer, weak-topic breakdown at the end.</p>
-      <button class="btn ghost" id="btnTest">Start mock test</button>
+      <h3>⏱️ Mock exam <span class="pill" id="lastTest" style="display:none"></span></h3>
+      <p>The real paper format: 30 questions (⅔ maths, ⅓ physics), 60 minutes, 75% to pass. Calculator allowed — just like the real thing.</p>
+      <button class="btn ghost" id="btnTest">Start mock exam</button>
     </div>
 
     <div class="card">
@@ -233,7 +233,7 @@ sup{font-size:.72em;}
       <button class="btn blue" id="btnLessons">Open logbook</button>
     </div>
 
-    <h3 style="margin:18px 4px 10px;">Topics <span class="pill">tap to practise — 12 correct = mastered</span></h3>
+    <h3 style="margin:18px 4px 10px;">On the paper <span class="pill">tap to practise — 12 correct = mastered</span></h3>
     <div id="topicList"></div>
 
     <div class="foot">
@@ -365,8 +365,39 @@ const g=(d,f)=>({d,f});
 
 /* ================= TOPICS & GENERATORS ================= */
 const TOPICS=[
+/* ---------- BIDMAS & NUMBER BASICS ---------- */
+{id:'bidmas',name:'BIDMAS & number basics',icon:'🧮',cat:'math',
+ concept:['Brackets → Indices → Divide/Multiply → Add/Subtract.','Same rank? Work left to right.','Comparing values: turn fractions into decimals first.'],
+ formula:'B → I → D M → A S',
+ gens:[
+  g(1,()=>{const a=ri(2,9),b=ri(2,9),c=ri(2,9),ans=a+b*c;return{text:`Work out: ${a} + ${b} × ${c}`,correct:ans,
+   steps:['BIDMAS: multiplication before addition.',`${b} × ${c} = ${b*c}`,`${a} + ${b*c} = ${ans}`]};}),
+  g(1,()=>{const a=ri(2,7),b=ri(2,7),c=ri(2,6),ans=(a+b)*c;return{text:`Work out: (${a} + ${b}) × ${c}`,correct:ans,
+   steps:['Brackets first.',`${a} + ${b} = ${a+b}`,`${a+b} × ${c} = ${ans}`]};}),
+  g(1,()=>{const c=ri(2,5),q=ri(2,6),b=c*q,a=ri(10,20),ans=a-q;return{text:`Work out: ${a} − ${b} ÷ ${c}`,correct:ans,
+   steps:['BIDMAS: division before subtraction.',`${b} ÷ ${c} = ${q}`,`${a} − ${q} = ${ans}`]};}),
+  g(1,()=>{return{text:'In BIDMAS, what comes immediately after Brackets?',correct:'Indices (powers)',
+   wrong:['Division','Addition','Multiplication'],
+   steps:['Brackets, Indices, Division/Multiplication, Addition/Subtraction.','Division and multiplication rank equally — work left to right.']};}),
+  g(2,()=>{const a=ri(2,6),b=ri(2,5),c=ri(2,4),ans=a+b*c*c;return{text:`Work out: ${a} + ${b} × ${c}<sup>2</sup>`,correct:ans,
+   steps:['BIDMAS: indices first, then multiply, then add.',`${c}² = ${c*c}`,`${b} × ${c*c} = ${b*c*c}`,`${a} + ${b*c*c} = ${ans}`]};}),
+  g(2,()=>{const p=pick([
+   {q:'Which is larger: 0.4 or 3/8?',a:'0.4',w:['3/8','They are equal','Cannot tell'],s:['3/8 = 0.375','0.4 > 0.375']},
+   {q:'Which is larger: 2/3 or 0.6?',a:'2/3',w:['0.6','They are equal','Cannot tell'],s:['2/3 ≈ 0.667','0.667 > 0.6']},
+   {q:'Which is larger: −3 or −5?',a:'−3',w:['−5','They are equal','Cannot tell'],s:['On the number line −3 sits to the right of −5.','−3 > −5']},
+   {q:'Which is larger: 0.25 or 1/5?',a:'0.25',w:['1/5','They are equal','Cannot tell'],s:['1/5 = 0.2','0.25 > 0.2']},
+   {q:'Which is larger: 7/10 or 0.65?',a:'7/10',w:['0.65','They are equal','Cannot tell'],s:['7/10 = 0.7','0.7 > 0.65']},
+  ]);return{text:p.q,correct:p.a,wrong:p.w,steps:p.s};}),
+  g(3,()=>{const a=ri(2,5),b=ri(2,6),c=ri(2,4);const p=pick([
+   {t:`2a + b²,  where a = ${a} and b = ${b}`,v:2*a+b*b,s:[`b² = ${b*b}`,`2a = ${2*a}`,`${2*a} + ${b*b} = ${2*a+b*b}`]},
+   {t:`a(b + c),  where a = ${a}, b = ${b}, c = ${c}`,v:a*(b+c),s:[`Brackets: b + c = ${b+c}`,`${a} × ${b+c} = ${a*(b+c)}`]},
+   {t:`ab − c,  where a = ${a}, b = ${b}, c = ${c}`,v:a*b-c,s:[`ab means a × b = ${a*b}`,`${a*b} − ${c} = ${a*b-c}`]},
+  ]);return{text:`Substitute and evaluate:<br>${p.t}`,correct:p.v,steps:p.s};}),
+  g(3,()=>{const c=ri(2,5),q2=ri(2,6),tot=c*q2,b=ri(1,tot-1),a=tot-b;return{text:`Work out: (${a} + ${b}) ÷ ${c}`,correct:q2,
+   steps:['Brackets first.',`${a} + ${b} = ${tot}`,`${tot} ÷ ${c} = ${q2}`]};}),
+ ]},
 /* ---------- 1 REARRANGING ---------- */
-{id:'rearr',name:'Rearranging equations',icon:'🔧',
+{id:'rearr',name:'Rearranging equations',icon:'🔧',cat:'math',
  concept:['Whatever you do to one side, do to the other.','Undo operations in reverse: + ↔ −, × ↔ ÷.','Get the letter you want on its own, step by step.'],
  formula:'v = d ÷ t &nbsp;→&nbsp; d = v × t &nbsp;→&nbsp; t = d ÷ v',
  gens:[
@@ -401,8 +432,48 @@ const TOPICS=[
    {q:'Q = mcΔT. Rearrange for c.',a:'c = Q ÷ (m × ΔT)',w:['c = m × ΔT ÷ Q','c = Q × m × ΔT','c = Q − mΔT'],s:['Divide both sides by m and by ΔT.','c = Q ÷ (m × ΔT)']},
   ]);return{text:p.q,correct:p.a,wrong:p.w,steps:p.s};}),
  ]},
+/* ---------- PROPORTIONALITY ---------- */
+{id:'prop',name:'Proportionality',icon:'⚖️',cat:'math',
+ concept:['Directly proportional: y = kx — double x, double y.','Inversely proportional: y = k/x — double x, halve y.','With powers: y ∝ x² means double x → y × 4.'],
+ formula:'y ∝ x → y = kx &nbsp;•&nbsp; y ∝ 1/x → y = k/x',
+ gens:[
+  g(1,()=>{const k=ri(2,6),x1=ri(2,5),x2=x1+ri(1,4),y1=k*x1,y2=k*x2;
+   return{text:`y is directly proportional to x, and y = ${y1} when x = ${x1}. Find y when x = ${x2}.`,correct:y2,
+   steps:[`y = kx, so k = ${y1} ÷ ${x1} = ${k}`,`y = ${k} × ${x2}`,`= ${y2}`]};}),
+  g(1,()=>{const p=pick([
+   {q:'y = 5x is an example of…',a:'Direct proportionality',w:['Inverse proportionality','A quadratic','An inequality'],s:['y = kx (here k = 5): as x doubles, y doubles.','That is direct proportion.']},
+   {q:'y = 8 ÷ x is an example of…',a:'Inverse proportionality',w:['Direct proportionality','A linear increase','Standard form'],s:['y = k/x (here k = 8): as x doubles, y halves.','That is inverse proportion.']},
+   {q:'If y is directly proportional to x, the graph of y against x is…',a:'A straight line through the origin',w:['A curve through the origin','A horizontal line','A straight line missing the origin'],s:['y = kx passes through (0, 0)','with constant gradient k.']},
+  ]);return{text:p.q,correct:p.a,wrong:p.w,steps:p.s};}),
+  g(2,()=>{const x1=pick([2,3,4]),y1=pick([6,8,12]),k=x1*y1,divs=[2,3,4,6].filter(d=>k%d===0&&d!==x1),x2=divs.length?pick(divs):2,y2=k/x2;
+   return{text:`y is inversely proportional to x, and y = ${y1} when x = ${x1}. Find y when x = ${x2}.`,correct:y2,
+   steps:[`y = k ÷ x, so k = ${y1} × ${x1} = ${k}`,`y = ${k} ÷ ${x2}`,`= ${fmt(y2)}`]};}),
+  g(2,()=>{const p=pick([
+   {q:'y is proportional to x². If x doubles, y is multiplied by…',a:'4',w:['2','8','16'],s:['y ∝ x²: scale factor gets squared.','2² = 4']},
+   {q:'y is proportional to x². If x triples, y is multiplied by…',a:'9',w:['3','6','27'],s:['y ∝ x²: scale factor gets squared.','3² = 9']},
+   {q:'y is proportional to x³. If x doubles, y is multiplied by…',a:'8',w:['2','4','6'],s:['y ∝ x³: scale factor gets cubed.','2³ = 8']},
+  ]);return{text:p.q,correct:p.a,wrong:p.w,steps:p.s};}),
+  g(2,()=>{const p=pick([
+   {q:'KE = ½mv². If speed doubles (same mass), kinetic energy is…',a:'× 4',w:['× 2','× 8','Unchanged'],s:['KE ∝ v² for fixed mass.','Double v → 2² = 4 times the energy.','This is why approach speed matters so much to landing distance!']},
+   {q:'KE = ½mv². If mass doubles (same speed), kinetic energy is…',a:'× 2',w:['× 4','× ½','Unchanged'],s:['KE ∝ m for fixed speed — a linear relationship.','Double m → double KE.']},
+   {q:'Lift ∝ V². If airspeed halves, lift becomes…',a:'A quarter of its value',w:['Half of its value','Double','Unchanged'],s:['Lift ∝ V²: scale factor squared.','(½)² = ¼']},
+  ]);return{text:p.q,correct:p.a,wrong:p.w,steps:p.s};}),
+  g(3,()=>{const p=pick([
+   {q:'y is inversely proportional to x². If x doubles, y is…',a:'÷ 4',w:['÷ 2','× 4','× 2'],s:['y ∝ 1/x²: doubling x multiplies x² by 4,','so y is divided by 4.']},
+   {q:'y is inversely proportional to x². If x triples, y is…',a:'÷ 9',w:['÷ 3','× 9','÷ 6'],s:['y ∝ 1/x²: tripling x multiplies x² by 9,','so y is divided by 9.']},
+  ]);return{text:p.q,correct:p.a,wrong:p.w,steps:p.s};}),
+  g(3,()=>{const p=pick([
+   {q:'P = F ÷ A, with F fixed. P is…',a:'Inversely proportional to A',w:['Directly proportional to A','Proportional to A²','Independent of A'],s:['P = F/A = k/A when F is constant.','Double the area → half the pressure.']},
+   {q:'d = v × t, with v fixed. d is…',a:'Directly proportional to t',w:['Inversely proportional to t','Proportional to t²','Independent of t'],s:['d = vt = kt when v is constant.','Double the time → double the distance.']},
+   {q:'ρ = m ÷ V, with m fixed. ρ is…',a:'Inversely proportional to V',w:['Directly proportional to V','Proportional to V²','Independent of V'],s:['ρ = m/V = k/V when m is constant.','Double the volume → half the density.']},
+   {q:'F = ma, with m fixed. F is…',a:'Directly proportional to a',w:['Inversely proportional to a','Proportional to a²','Independent of a'],s:['F = ma = ka when m is constant.','Double the acceleration → double the force.']},
+  ]);return{text:p.q,correct:p.a,wrong:p.w,steps:p.s};}),
+  g(3,()=>{const k=pick([1,2,3]),x1=2,y1=k*4,x2=pick([3,4,5]),y2=k*x2*x2;
+   return{text:`y is proportional to x², and y = ${y1} when x = ${x1}. Find y when x = ${x2}.`,correct:y2,
+   steps:[`y = kx², so k = ${y1} ÷ ${x1}² = ${k}`,`y = ${k} × ${x2}² = ${k} × ${x2*x2}`,`= ${y2}`]};}),
+ ]},
 /* ---------- 2 SPEED DISTANCE TIME ---------- */
-{id:'sdt',name:'Speed, distance, time & fuel',icon:'⏱️',
+{id:'sdt',name:'Speed, distance, time & fuel',icon:'⏱️',cat:'phys',
  concept:['Speed = distance ÷ time. Cover one, read the other two.','Knots = nautical miles per hour. 120 kt = 2 nm every minute.','Fuel used = burn rate × time.'],
  formula:'S = D ÷ T &nbsp;•&nbsp; Fuel = rate × time',
  gens:[
@@ -429,7 +500,7 @@ const TOPICS=[
    steps:[`${s} kt = ${nmpm} nm per minute (÷60).`,`Time = ${d} ÷ ${nmpm}`,`= ${m} minutes`]};}),
  ]},
 /* ---------- 3 TRIG ---------- */
-{id:'trig',name:'Trigonometry (SOHCAHTOA)',icon:'📐',
+{id:'trig',name:'Trigonometry (SOHCAHTOA)',icon:'📐',cat:'math',
  concept:['SOH-CAH-TOA: sin = Opp/Hyp, cos = Adj/Hyp, tan = Opp/Adj.','Hypotenuse = longest side, opposite the right angle.','Key values: sin 30° = 0.5, tan 45° = 1, cos 60° = 0.5.'],
  formula:'sin θ = O/H &nbsp; cos θ = A/H &nbsp; tan θ = O/A',
  gens:[
@@ -464,9 +535,15 @@ const TOPICS=[
    steps:['Pythagoras: a² = c² − b²',`a² = ${t[2]}² − ${t[1]}² = ${t[2]*t[2]} − ${t[1]*t[1]} = ${t[0]*t[0]}`,`a = √${t[0]*t[0]} = ${t[0]}`]};}),
   g(3,()=>{const n=pick([2,3,4,5,6,8,10]),loss=300*n;return{text:`On a 3° glideslope you lose ≈300 ft per nm. Height lost over ${n} nm?`,correct:loss,unit:' ft',
    steps:['Rule of thumb: tan 3° ≈ 0.05, and 0.05 × 6076 ft ≈ 300 ft per nm.',`Height loss = 300 × ${n}`,`= ${fmt(loss)} ft`]};}),
+  g(2,()=>{const p=pick([
+   {k:'opposite and the hypotenuse',a:'sin⁻¹ (opp ÷ hyp)',w:['cos⁻¹ (opp ÷ hyp)','tan⁻¹ (opp ÷ hyp)','sin (opp ÷ hyp)']},
+   {k:'adjacent and the hypotenuse',a:'cos⁻¹ (adj ÷ hyp)',w:['sin⁻¹ (adj ÷ hyp)','tan⁻¹ (adj ÷ hyp)','cos (adj ÷ hyp)']},
+   {k:'opposite and the adjacent',a:'tan⁻¹ (opp ÷ adj)',w:['sin⁻¹ (opp ÷ adj)','cos⁻¹ (opp ÷ adj)','tan (opp ÷ adj)']},
+  ]);return{text:`You know the ${p.k} and want the ANGLE. Which calculator function do you use?`,correct:p.a,wrong:p.w,
+   steps:['To go from a ratio back to the angle, use the INVERSE function','(sin⁻¹, cos⁻¹ or tan⁻¹ — usually SHIFT + sin/cos/tan).',`Here: ${p.a}`]};}),
  ]},
 /* ---------- 4 FRACTIONS PERCENTAGES RATIOS ---------- */
-{id:'frac',name:'Fractions, percentages, ratios',icon:'➗',
+{id:'frac',name:'Fractions, percentages, ratios',icon:'➗',cat:'math',
  concept:['Fraction of an amount: divide by the bottom, times the top.','10% = ÷10. Build others from it: 5% is half of 10%, 15% = 10% + 5%.','Ratio a:b has (a+b) parts — find one part first.'],
  formula:'x% of N = N × x ÷ 100',
  gens:[
@@ -507,9 +584,16 @@ const TOPICS=[
    {q:'1/3 + 1/6',a:'1/2',w:['2/9','5/6','1/4'],s:['Common denominator 6: 1/3 = 2/6','2/6 + 1/6 = 3/6 = 1/2']},
    {q:'2/5 + 1/5',a:'3/5',w:['3/10','2/5','1/2'],s:['Same denominator — just add the tops.','2/5 + 1/5 = 3/5']},
   ]);return{text:`Work out: ${p.q}`,correct:p.a,wrong:p.w,steps:p.s};}),
+  g(2,()=>{const p=pick([
+   {q:'Increasing a value by 15% is the same as multiplying by…',a:'1.15',w:['0.15','1.5','0.85'],s:['100% + 15% = 115%','= 1.15 as a multiplier']},
+   {q:'Decreasing a value by 20% is the same as multiplying by…',a:'0.8',w:['0.2','1.2','0.98'],s:['100% − 20% = 80%','= 0.8 as a multiplier']},
+   {q:'Landing distance increases by 10% on a wet runway. What factor do you multiply by?',a:'1.1',w:['0.1','1.01','0.9'],s:['100% + 10% = 110%','= 1.1 — this "factorisation" is exactly how runway performance corrections work.']},
+   {q:'Increasing a value by 5% is the same as multiplying by…',a:'1.05',w:['0.05','1.5','0.95'],s:['100% + 5% = 105%','= 1.05 as a multiplier']},
+   {q:'Decreasing a value by 35% is the same as multiplying by…',a:'0.65',w:['0.35','1.35','0.65%'],s:['100% − 35% = 65%','= 0.65 as a multiplier']},
+  ]);return{text:p.q,correct:p.a,wrong:p.w,steps:p.s};}),
  ]},
 /* ---------- 5 UNIT CONVERSIONS ---------- */
-{id:'units',name:'Unit conversions',icon:'🔄',
+{id:'units',name:'Unit conversions',icon:'🔄',cat:'phys',bonus:true,
  concept:['1 kg ≈ 2.2 lb • 1 nm ≈ 1.85 km • 1000 ft ≈ 300 m.','°F = (°C × 1.8) + 32. And 15 °C = 59 °F (ISA!).','m/s → km/h: multiply by 3.6. 1 kt = 1 nm per hour.'],
  formula:'°F = 1.8 × °C + 32',
  gens:[
@@ -550,7 +634,7 @@ const TOPICS=[
     steps:['Mass = volume × density',`= ${L} × 0.8`,`= ${fmt(kg)} kg`]};}),
  ]},
 /* ---------- 6 INDICES & STANDARD FORM ---------- */
-{id:'indices',name:'Indices & standard form',icon:'🔢',
+{id:'indices',name:'Indices, standard form & SI prefixes',icon:'🔢',cat:'math',
  concept:['Multiply powers → add indices. Divide → subtract. Power of power → multiply.','Standard form: a × 10ⁿ with 1 ≤ a &lt; 10.','Negative index = 1 over: 10⁻² = 0.01.'],
  formula:'x<sup>a</sup> × x<sup>b</sup> = x<sup>a+b</sup>',
  gens:[
@@ -588,9 +672,25 @@ const TOPICS=[
    {q:'10<sup>−2</sup>',a:'0.01',w:['−100','0.1','−0.01']},
   ]);return{text:`Evaluate ${p.q}`,correct:p.a,wrong:p.w,
    steps:['A negative index means "1 over".','x<sup>−n</sup> = 1 ÷ x<sup>n</sup>',`So ${p.q} = ${p.a}`]};}),
+  g(2,()=>{const p=pick([
+   {q:'milli (m)',a:'10<sup>−3</sup>',w:['10<sup>−6</sup>','10<sup>3</sup>','10<sup>−2</sup>']},
+   {q:'micro (µ)',a:'10<sup>−6</sup>',w:['10<sup>−3</sup>','10<sup>−9</sup>','10<sup>6</sup>']},
+   {q:'nano (n)',a:'10<sup>−9</sup>',w:['10<sup>−6</sup>','10<sup>−3</sup>','10<sup>9</sup>']},
+   {q:'kilo (k)',a:'10<sup>3</sup>',w:['10<sup>6</sup>','10<sup>2</sup>','10<sup>−3</sup>']},
+   {q:'mega (M)',a:'10<sup>6</sup>',w:['10<sup>3</sup>','10<sup>9</sup>','10<sup>−6</sup>']},
+   {q:'giga (G)',a:'10<sup>9</sup>',w:['10<sup>6</sup>','10<sup>12</sup>','10<sup>−9</sup>']},
+  ]);return{text:`The SI prefix ${p.q} means × …`,correct:p.a,wrong:p.w,
+   steps:['Going up: kilo 10³, mega 10⁶, giga 10⁹.','Going down: milli 10⁻³, micro 10⁻⁶, nano 10⁻⁹.',`${p.q} = ${p.a.replace(/<\/?sup>/g,'^')}`]};}),
+  g(3,()=>{const p=pick([
+   {q:'Write 5 MHz in Hz, in standard form.',a:'5 × 10<sup>6</sup> Hz',w:['5 × 10<sup>3</sup> Hz','5 × 10<sup>9</sup> Hz','5 × 10<sup>−6</sup> Hz'],s:['mega = 10⁶','5 MHz = 5 × 10⁶ Hz']},
+   {q:'Write 3 mm in metres, in standard form.',a:'3 × 10<sup>−3</sup> m',w:['3 × 10<sup>3</sup> m','3 × 10<sup>−6</sup> m','3 × 10<sup>−2</sup> m'],s:['milli = 10⁻³','3 mm = 3 × 10⁻³ m']},
+   {q:'Write 2 GHz in Hz, in standard form.',a:'2 × 10<sup>9</sup> Hz',w:['2 × 10<sup>6</sup> Hz','2 × 10<sup>12</sup> Hz','2 × 10<sup>−9</sup> Hz'],s:['giga = 10⁹','2 GHz = 2 × 10⁹ Hz']},
+   {q:'Write 7 µs in seconds, in standard form.',a:'7 × 10<sup>−6</sup> s',w:['7 × 10<sup>−3</sup> s','7 × 10<sup>−9</sup> s','7 × 10<sup>6</sup> s'],s:['micro = 10⁻⁶','7 µs = 7 × 10⁻⁶ s']},
+   {q:'Write 4 km in metres, in standard form.',a:'4 × 10<sup>3</sup> m',w:['4 × 10<sup>2</sup> m','4 × 10<sup>6</sup> m','4 × 10<sup>−3</sup> m'],s:['kilo = 10³','4 km = 4 × 10³ m = 4000 m']},
+  ]);return{text:p.q,correct:p.a,wrong:p.w,steps:p.s};}),
  ]},
 /* ---------- 7 VECTORS ---------- */
-{id:'vectors',name:'Vectors & triangle of velocities',icon:'🧭',
+{id:'vectors',name:'Vectors & triangle of velocities',icon:'🧭',cat:'phys',
  concept:['Groundspeed = TAS − headwind, or TAS + tailwind.','Perpendicular vectors: use Pythagoras for the resultant.','Wind 30° off the runway → crosswind ≈ half the wind speed.'],
  formula:'XWC = wind × sin θ &nbsp;•&nbsp; HWC = wind × cos θ',
  gens:[
@@ -624,7 +724,7 @@ const TOPICS=[
    steps:[`GS = ${tas} − ${hw} = ${gs} kt`,`Time = distance ÷ GS = ${d} ÷ ${gs}`,`= 2 hours`]};}),
  ]},
 /* ---------- 8 MECHANICS ---------- */
-{id:'mech',name:'Mechanics — forces & moments',icon:'⚙️',
+{id:'mech',name:'Mechanics — forces, momentum, moments',icon:'⚙️',cat:'phys',
  concept:['F = ma. No resultant force → constant velocity (Newton 1).','Weight = mass × g. Use g = 10 N/kg.','Moment = force × perpendicular distance from the pivot.'],
  formula:'F = m × a &nbsp;•&nbsp; W = m × g &nbsp;•&nbsp; M = F × d',
  gens:[
@@ -653,9 +753,28 @@ const TOPICS=[
    {q:'A propeller pushes air backwards; the air pushes the propeller forwards. This is…',a:'Newton\'s 3rd law',w:['Newton\'s 1st law','Newton\'s 2nd law','Bernoulli\'s principle'],s:['3rd law: every action has an equal and opposite reaction.']},
    {q:'An object stays at rest unless acted on by a resultant force. This is…',a:'Newton\'s 1st law',w:['Newton\'s 2nd law','Newton\'s 3rd law','Hooke\'s law'],s:['1st law: inertia — no resultant force, no change in motion.']},
   ]);return{text:p.q,correct:p.a,wrong:p.w,steps:p.s};}),
+  g(1,()=>{const p=pick([
+   {q:'Which of these is a VECTOR?',a:'Velocity',w:['Speed','Mass','Temperature'],s:['Vectors have magnitude AND direction.','Velocity, force, displacement, acceleration are vectors;','speed, distance, mass, energy, temperature are scalars.']},
+   {q:'Which of these is a VECTOR?',a:'Force',w:['Distance','Energy','Time'],s:['Vectors have magnitude AND direction.','Force, velocity, displacement are vectors;','distance, energy, time are scalars.']},
+   {q:'Which of these is a SCALAR?',a:'Speed',w:['Velocity','Force','Displacement'],s:['Scalars have magnitude only, no direction.','Speed is a scalar; velocity is speed WITH direction.']},
+   {q:'Which of these is a SCALAR?',a:'Mass',w:['Weight','Acceleration','Lift'],s:['Mass is just an amount — a scalar.','Weight is a force (downwards), so it is a vector.']},
+  ]);return{text:p.q,correct:p.a,wrong:p.w,steps:p.s};}),
+  g(2,()=>{const m=pick([2,4,5,10]),v=pick([3,5,10,20]),p2=m*v;return{text:`Mass ${m} kg moving at ${v} m/s. Momentum?`,correct:p2,unit:' kg·m/s',
+   steps:['Momentum = mass × velocity',`= ${m} × ${v}`,`= ${fmt(p2)} kg·m/s`]};}),
+  g(2,()=>{const a=pick([2,3,5]),t=pick([4,5,6,10]),u=pick([0,10,20]),v=u+a*t;
+   return{text:`Speed increases steadily from ${u} m/s to ${v} m/s in ${t} s. Acceleration?`,correct:a,unit:' m/s²',
+   steps:['a = change in velocity ÷ time',`= (${v} − ${u}) ÷ ${t} = ${v-u} ÷ ${t}`,`= ${a} m/s²`]};}),
+  g(3,()=>{const p=pick([[4,6,8,2],[2,9,4,3],[6,5,4,3],[3,8,5,2.4]]);const tot=p[0]*p[1],mSum=p[0]+p[2];
+   return{text:`A ${p[0]} kg trolley at ${p[1]} m/s collides with a stationary ${p[2]} kg trolley and they stick together. Speed afterwards?`,correct:p[3],unit:' m/s',
+   steps:['Momentum is conserved.',`Before: ${p[0]} × ${p[1]} = ${tot} kg·m/s`,`After: ${tot} ÷ (${p[0]} + ${p[2]}) = ${tot} ÷ ${mSum}`,`= ${fmt(p[3])} m/s`]};}),
+  g(3,()=>{const p=pick([
+   {q:'At terminal velocity, a falling object…',a:'Has zero acceleration — drag equals weight',w:['Keeps accelerating','Has zero drag','Starts to slow down'],s:['Drag grows with speed until it balances weight.','Balanced forces → no resultant → constant (terminal) velocity.']},
+   {q:'Inertia is best described as…',a:'Resistance to a change in motion',w:['A type of friction','The force of gravity','Energy stored in motion'],s:['Inertia depends only on mass:','more mass → harder to start, stop, or turn.']},
+   {q:'Momentum is conserved in a collision when…',a:'No external forces act on the system',w:['The objects bounce apart','The objects are the same mass','Energy is lost as heat'],s:['Total momentum before = total momentum after,','provided no outside force (like friction) interferes.']},
+  ]);return{text:p.q,correct:p.a,wrong:p.w,steps:p.s};}),
  ]},
 /* ---------- 9 ENERGY ---------- */
-{id:'energy',name:'Work, energy, power',icon:'⚡',
+{id:'energy',name:'Work, energy, power',icon:'⚡',cat:'phys',
  concept:['Work = force × distance (joules).','Power = work ÷ time (watts).','KE = ½mv², GPE = mgh (g = 10).'],
  formula:'W = F × d &nbsp;•&nbsp; P = W ÷ t &nbsp;•&nbsp; KE = ½mv²',
  gens:[
@@ -678,7 +797,7 @@ const TOPICS=[
    steps:['Efficiency = useful ÷ input × 100',`= ${fmt(p[0])} ÷ ${fmt(p[1])} × 100`,`= ${p[2]}%`]};}),
  ]},
 /* ---------- 10 PRESSURE ---------- */
-{id:'pressure',name:'Pressure, density, gas laws',icon:'🌡️',
+{id:'pressure',name:'Pressure, density & the gas laws',icon:'🌡️',cat:'phys',
  concept:['Pressure = force ÷ area. Density = mass ÷ volume.','Higher altitude → lower pressure and lower density.','Boyle: P₁V₁ = P₂V₂ (constant temperature). Kelvin = °C + 273.'],
  formula:'P = F ÷ A &nbsp;•&nbsp; ρ = m ÷ V &nbsp;•&nbsp; P₁V₁ = P₂V₂',
  gens:[
@@ -706,9 +825,54 @@ const TOPICS=[
   ]);return{text:p.q,correct:p.a,wrong:p.w,steps:p.s};}),
   g(3,()=>{const h=pick([2,5,10]),P=1000*10*h;return{text:`Pressure due to ${h} m of water (ρ = 1000 kg/m³, g = 10)?`,correct:P,unit:' Pa',
    steps:['P = ρ × g × h',`= 1000 × 10 × ${h}`,`= ${fmt(P)} Pa`]};}),
+  g(3,()=>{const p=pick([[2,300,600,4],[3,200,400,6],[4,300,150,2],[6,250,500,12]]);
+   return{text:`Charles' law: ${p[0]} L of gas at ${p[1]} K is heated to ${p[2]} K at constant pressure. New volume?`,correct:p[3],unit:' L',
+   steps:['Charles\' law: V₁ ÷ T₁ = V₂ ÷ T₂ (T in kelvin!)',`${p[0]} ÷ ${p[1]} = V₂ ÷ ${p[2]}`,`V₂ = ${p[0]} × ${p[2]} ÷ ${p[1]} = ${p[3]} L`]};}),
+  g(3,()=>{const p=pick([[100,250,500,200],[200,300,150,100],[150,300,600,300],[120,200,400,240]]);
+   return{text:`Gay-Lussac's law: gas at ${p[0]} kPa and ${p[1]} K is heated to ${p[2]} K at constant volume. New pressure?`,correct:p[3],unit:' kPa',
+   steps:['Gay-Lussac\'s law: P₁ ÷ T₁ = P₂ ÷ T₂ (T in kelvin!)',`${p[0]} ÷ ${p[1]} = P₂ ÷ ${p[2]}`,`P₂ = ${p[0]} × ${p[2]} ÷ ${p[1]} = ${p[3]} kPa`]};}),
+  g(2,()=>{const p=pick([
+   {q:'Humid air, compared with dry air at the same temperature and pressure, is…',a:'Less dense',w:['More dense','The same density','Twice as dense'],s:['Water vapour molecules (H₂O, mass 18) are lighter than','the N₂ (28) and O₂ (32) they displace — so humid air is less dense.','That is why performance suffers on hot, humid days.']},
+   {q:'ISA sea-level temperature is…',a:'+15 °C',w:['0 °C','+10 °C','+20 °C'],s:['International Standard Atmosphere:','1013.25 hPa and +15 °C at sea level.']},
+   {q:'The combined gas law says that which quantity stays constant?',a:'P × V ÷ T',w:['P + V + T','P × V × T','P ÷ (V × T)'],s:['PV/T = constant combines Boyle\'s, Charles\' and Gay-Lussac\'s laws.','Hold any one variable steady and the other two laws drop out.']},
+   {q:'Dry air is approximately…',a:'78% nitrogen, 21% oxygen',w:['21% nitrogen, 78% oxygen','50% nitrogen, 50% oxygen','90% oxygen, 10% nitrogen'],s:['78% N₂, 21% O₂, ~1% argon and traces.','The proportions stay the same with altitude — density falls instead.']},
+  ]);return{text:p.q,correct:p.a,wrong:p.w,steps:p.s};}),
+ ]},
+/* ---------- GYROSCOPES ---------- */
+{id:'gyro',name:'Gyroscopes',icon:'🌀',cat:'phys',
+ concept:['Rigidity: a spinning rotor keeps its axis fixed in space. More RPM, mass, or radius of gyration → more rigidity.','Precession: an applied force acts 90° later, in the direction of rotation.','Apparent wander comes from the Earth rotating; real wander from friction and imperfections.'],
+ formula:'Force applied → felt 90° on, in the direction of spin',
+ gens:[
+  g(1,()=>{const p=pick([
+   {q:'A spinning gyro\'s tendency to keep its axis pointing the same way in space is called…',a:'Rigidity',w:['Precession','Wander','Torque'],s:['Rigidity (in space) is the gyro\'s first fundamental property.','It is what makes gyros useful as a stable reference.']},
+   {q:'The tilting of a gyro\'s axis in response to an applied force is called…',a:'Precession',w:['Rigidity','Variation','Deviation'],s:['Precession is the gyro\'s second fundamental property.','The force acts 90° later, in the direction of rotation.']},
+  ]);return{text:p.q,correct:p.a,wrong:p.w,steps:p.s};}),
+  g(1,()=>{const p=pick([
+   {q:'Which of these INCREASES a gyro\'s rigidity?',a:'Increasing rotor RPM',w:['Reducing rotor mass','Making the rotor smaller','Adding friction to the bearings'],s:['Rigidity increases with rotor speed (RPM),','rotor mass, and radius of gyration (mass out at the rim).']},
+   {q:'Which of these INCREASES a gyro\'s rigidity?',a:'Concentrating mass at the rotor rim',w:['Slowing the rotor down','Reducing rotor mass','Shrinking the rotor diameter'],s:['Mass at the rim = larger radius of gyration.','More RPM, more mass, bigger radius → more rigidity.']},
+  ]);return{text:p.q,correct:p.a,wrong:p.w,steps:p.s};}),
+  g(2,()=>{return{text:'A force is applied to the rim of a spinning gyro. Where is its effect felt?',
+   correct:'90° later, in the direction of rotation',
+   wrong:['At the point of application','180° opposite the applied force','Nowhere — rigidity absorbs it'],
+   steps:['This is precession.','The gyro behaves as if the force were applied 90° on,','measured in the direction the rotor spins.']};}),
+  g(2,()=>{return{text:'The rings that let a gyro rotor hold its attitude while the instrument case moves around it are called…',
+   correct:'Gimbals',wrong:['Bearings','Stators','Callipers'],
+   steps:['Gimbals give the rotor freedom of movement about its axes.','The number of gimbals sets the gyro\'s degrees of freedom.']};}),
+  g(2,()=>{const p=pick([
+   {q:'APPARENT wander of a gyro is caused by…',a:'The Earth rotating beneath the gyro',w:['Bearing friction','Manufacturing imperfections','Low rotor RPM'],s:['The gyro stays rigid in space while the Earth turns under it,','so it appears to wander even though it hasn\'t moved.']},
+   {q:'REAL wander of a gyro is caused by…',a:'Bearing friction and mechanical imperfections',w:['The Earth\'s rotation','The aircraft turning','Magnetic variation'],s:['Real wander is genuine movement of the spin axis,','caused by friction, imbalance and imperfect bearings.']},
+  ]);return{text:p.q,correct:p.a,wrong:p.w,steps:p.s};}),
+  g(3,()=>{const p=pick([
+   {q:'A gyro with GREATER rigidity will precess…',a:'More slowly for the same applied force',w:['Faster for the same force','At the same rate','Unpredictably'],s:['Precession rate ∝ applied force ÷ rigidity.','More rigidity (RPM, mass, radius) → slower precession.']},
+   {q:'For a given gyro, a LARGER applied force causes…',a:'A faster rate of precession',w:['A slower rate of precession','No precession','More rigidity'],s:['Precession rate ∝ applied force ÷ rigidity.','Bigger force → faster precession.']},
+  ]);return{text:p.q,correct:p.a,wrong:p.w,steps:p.s};}),
+  g(3,()=>{const p=pick([
+   {q:'The attitude indicator uses an earth gyro with its spin axis…',a:'Vertical',w:['Horizontal','Fore-and-aft','Aligned with the wings'],s:['The AI references the earth vertical,','so its rotor spins about a vertical axis.']},
+   {q:'The direction indicator uses a tied gyro with its spin axis…',a:'Horizontal',w:['Vertical','At 45°','Constantly tilting'],s:['The DI references headings in the horizontal plane,','so its rotor spins about a horizontal axis.']},
+  ]);return{text:p.q,correct:p.a,wrong:p.w,steps:p.s};}),
  ]},
 /* ---------- 11 ELECTRICITY ---------- */
-{id:'elec',name:'Electricity — Ohm\'s law & circuits',icon:'🔋',
+{id:'elec',name:'Electricity — Ohm\'s law & circuits',icon:'🔋',cat:'phys',bonus:true,
  concept:['V = I × R. Cover the one you want.','Series: resistances add, current is the same everywhere.','Parallel: total resistance is less than the smallest branch.'],
  formula:'V = I × R &nbsp;•&nbsp; P = I × V',
  gens:[
@@ -745,7 +909,7 @@ const TOPICS=[
    steps:['P = I² × R',`= ${I*I} × ${R}`,`= ${fmt(P)} W`]};}),
  ]},
 /* ---------- 12 GRAPHS ---------- */
-{id:'graphs',name:'Graphs & interpolation',icon:'📈',
+{id:'graphs',name:'Graphs & interpolation',icon:'📈',cat:'math',bonus:true,
  concept:['Gradient = rise ÷ run = change in y ÷ change in x.','Distance–time: gradient = speed. Speed–time: gradient = acceleration, area = distance.','Interpolate: value between two table entries — go proportionally.'],
  formula:'m = (y₂ − y₁) ÷ (x₂ − x₁)',
  gens:[
@@ -777,7 +941,7 @@ const TOPICS=[
    steps:[`${y} = ${m}x + ${c}`,`Subtract ${c}: ${m}x = ${y-c}`,`x = ${y-c} ÷ ${m} = ${x}`]};}),
  ]},
 /* ---------- 13 WAVES HEAT MAGNETISM ---------- */
-{id:'waves',name:'Heat, waves, magnetism',icon:'📡',
+{id:'waves',name:'Heat, waves, magnetism',icon:'📡',cat:'phys',bonus:true,
  concept:['Wave speed = frequency × wavelength.','Heat energy: E = mcΔT. Conduction (solids), convection (fluids), radiation (no medium needed).','Like magnetic poles repel; unlike poles attract.'],
  formula:'v = f × λ &nbsp;•&nbsp; E = mcΔT',
  gens:[
@@ -838,13 +1002,13 @@ function renderHome(){
   $('#stAcc').textContent=S.answered?Math.round(100*S.right/S.answered)+'%':'—';
   $('#stStreak').textContent=S.best;
   const mastered=TOPICS.filter(t=>tp(t.id).c>=MASTER).length;
-  $('#stMastered').textContent=mastered+'/13';
+  $('#stMastered').textContent=mastered+'/'+TOPICS.length;
   $('#warmDone').style.display=S.warm[todayStr()]!=null?'inline':'none';
   $('#lessonCount').textContent=(S.lessons||[]).length+' logged';
   const lt=S.tests[S.tests.length-1];
-  if(lt){$('#lastTest').style.display='inline-block';$('#lastTest').textContent=`last: ${lt.score}/20`;}
+  if(lt){$('#lastTest').style.display='inline-block';$('#lastTest').textContent=`last: ${lt.score}/${lt.total||20}`;}
   const list=$('#topicList');list.innerHTML='';
-  TOPICS.forEach(t=>{
+  const addTopic=t=>{
     const p=tp(t.id),done=p.c>=MASTER,pct=Math.min(100,Math.round(100*p.c/MASTER));
     const b=document.createElement('button');b.className='topic';
     b.innerHTML=`<span class="ic">${t.icon}</span>
@@ -853,7 +1017,13 @@ function renderHome(){
       <span class="tick ${done?'done':'todo'}">${done?'✔':'○'}</span>`;
     b.onclick=()=>openConcept(t.id);
     list.appendChild(b);
-  });
+  };
+  TOPICS.filter(t=>!t.bonus).forEach(addTopic);
+  const dv=document.createElement('h3');
+  dv.style.cssText='margin:18px 4px 10px;';
+  dv.innerHTML='Bonus <span class="pill">not on the paper — handy for flying</span>';
+  list.appendChild(dv);
+  TOPICS.filter(t=>t.bonus).forEach(addTopic);
 }
 
 /* ================= quiz engine ================= */
@@ -992,9 +1162,14 @@ function startWarm(){
 
 /* ================= test mode ================= */
 function startTest(){
-  const order=shuffle(TOPICS.concat(TOPICS)).slice(0,20);
-  const queue=order.map(t=>makeQ(t,pick(t.gens)));
-  Q={mode:'test',topic:null,queue,idx:0,right:0,asked:0,streak:0,gen:null,cur:null,timer:null,timeLeft:40*60,answers:[]};
+  /* real paper format: 30 MCQs, 2/3 maths + 1/3 physics, 60 min, 75% pass */
+  const mathT=shuffle(TOPICS.filter(t=>!t.bonus&&t.cat==='math'));
+  const physT=shuffle(TOPICS.filter(t=>!t.bonus&&t.cat==='phys'));
+  const picks=[];
+  for(let i=0;i<20;i++)picks.push(mathT[i%mathT.length]);
+  for(let i=0;i<10;i++)picks.push(physT[i%physT.length]);
+  const queue=shuffle(picks).map(t=>makeQ(t,pick(t.gens)));
+  Q={mode:'test',topic:null,queue,idx:0,right:0,asked:0,streak:0,gen:null,cur:null,timer:null,timeLeft:60*60,answers:[]};
   show('#scr-quiz');
   Q.timer=setInterval(()=>{
     Q.timeLeft--;updateTimerDisp();
@@ -1026,16 +1201,16 @@ function finishSession(timedOut){
     while(Q.answers.length<Q.queue.length){
       Q.answers.push({topicId:Q.queue[Q.answers.length].topicId,ok:false});
     }
-    const score=Q.answers.filter(a=>a.ok).length;
+    const score=Q.answers.filter(a=>a.ok).length,total=Q.queue.length;
     /* update topic stats from test too */
     Q.answers.forEach(a=>{const p=tp(a.topicId);p.a++;S.answered++;if(a.ok){p.c++;S.right++;}});
     const br={};
     Q.answers.forEach(a=>{br[a.topicId]=br[a.topicId]||{c:0,a:0};br[a.topicId].a++;if(a.ok)br[a.topicId].c++;});
-    S.tests.push({date:todayStr(),score});save();
-    $('#rTitle').textContent='Test result';
-    $('#rScore').textContent=`${score}/20`;
-    const pct=Math.round(score*5);
-    $('#rSub').textContent=(timedOut?'⏱ Time ran out. ':'')+(pct>=80?`${pct}% — excellent, test-ready form.`:pct>=60?`${pct}% — close. Hit the weak topics below.`:`${pct}% — focus practice on the red topics.`);
+    S.tests.push({date:todayStr(),score,total});save();
+    $('#rTitle').textContent='Mock exam result';
+    $('#rScore').textContent=`${score}/${total}`;
+    const pct=Math.round(100*score/total);
+    $('#rSub').textContent=(timedOut?'⏱ Time ran out. ':'')+(pct>=75?`${pct}% — PASS! The real paper needs 75%. ✈️`:pct>=60?`${pct}% — close, but the pass mark is 75%. Hit the weak topics below.`:`${pct}% — pass mark is 75%. Focus practice on the topics below.`);
     $('#rBreakCard').style.display='block';
     const rows=$('#rRows');rows.innerHTML='';
     Object.keys(br).forEach(id=>{
@@ -1048,7 +1223,7 @@ function finishSession(timedOut){
       div.appendChild(go);
       rows.appendChild(div);
     });
-    $('#rAgain').textContent='Take another test';
+    $('#rAgain').textContent='Take another mock';
     $('#rAgain').onclick=startTest;
     show('#scr-results');
   }
