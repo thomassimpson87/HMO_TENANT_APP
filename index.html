@@ -142,6 +142,53 @@ header.top{
   background:var(--card2); color:var(--gold2); border:1px solid var(--line);
   border-radius:10px; padding:7px 11px; font-weight:700; cursor:pointer; font-size:.85rem;
 }
+/* lessons / logbook */
+.lesson{background:var(--card); border:1px solid var(--line); border-radius:16px; margin-bottom:12px; overflow:hidden;}
+.lhead{display:flex; align-items:center; gap:12px; padding:14px; cursor:pointer;}
+.lhead:active{background:var(--card2);}
+.lhead .date{
+  background:#0c1c3a; border:1px solid var(--gold); color:var(--gold2);
+  border-radius:10px; padding:6px 9px; font-weight:800; font-size:.75rem;
+  text-align:center; line-height:1.2; min-width:46px;
+}
+.lhead .lt{flex:1; min-width:0;}
+.lhead .lt b{display:block; font-size:1rem;}
+.lhead .lt small{color:var(--dim);}
+.lhead .chev{color:var(--dim); font-size:1.1rem; transition:transform .25s;}
+.lesson.open .chev{transform:rotate(90deg);}
+.lbody{display:none; padding:0 14px 14px;}
+.lesson.open .lbody{display:block;}
+.tagrow{display:flex; flex-wrap:wrap; gap:6px; margin:2px 0 12px;}
+.tag{border-radius:99px; padding:4px 11px; font-size:.72rem; font-weight:800;}
+.tag.t1{background:#123c2a; color:#7dffb9; border:1px solid #1f7a4d;}
+.tag.t2{background:#3a2a08; color:var(--gold2); border:1px solid #8a6a1d;}
+.tag.t3{background:#0d2f4d; color:#7cc7ff; border:1px solid #1d5c8a;}
+.tag.t4{background:#3c1430; color:#ff9ad5; border:1px solid #7a1f5c;}
+.lsec{border-left:4px solid; border-radius:10px; background:#0c1c3a; padding:10px 12px; margin-bottom:10px;}
+.lsec h5{margin:0 0 6px; font-size:.78rem; text-transform:uppercase; letter-spacing:.6px;}
+.lsec ul{margin:0; padding-left:18px;}
+.lsec li{font-size:.9rem; margin-bottom:5px;}
+.lsec p{margin:0; font-size:.9rem; color:var(--ink);}
+.lsec.well{border-color:var(--green);} .lsec.well h5{color:var(--green);}
+.lsec.work{border-color:var(--gold);} .lsec.work h5{color:var(--gold2);}
+.lsec.plan{border-color:#4da3ff;} .lsec.plan h5{color:#7cc7ff;}
+.lsec.note{border-color:#b98cff;} .lsec.note h5{color:#c9a6ff;}
+details.raw{background:#0c1c3a; border:1px solid var(--line); border-radius:10px; padding:9px 12px; color:var(--dim); font-size:.85rem; margin-bottom:10px;}
+details.raw summary{cursor:pointer; font-weight:700; color:var(--ink);}
+details.raw p{white-space:pre-wrap; margin:8px 0 0;}
+.lactions{display:flex; gap:8px; margin-top:4px;}
+.lactions .btn{flex:1;}
+.btn.danger{background:#3c1420; color:#ffb3bb; border:1px solid #7a2333;}
+.btn.blue{background:linear-gradient(90deg,#1d5c8a,#123c68); color:#dff0ff; border:1px solid #2a6da0;}
+.fld{margin-bottom:12px;}
+.fld label{display:block; font-size:.78rem; color:var(--dim); font-weight:800; margin-bottom:5px; text-transform:uppercase; letter-spacing:.5px;}
+.fld input,.fld textarea{
+  width:100%; background:#0c1c3a; border:1px solid var(--line); border-radius:12px;
+  color:var(--ink); padding:12px; font-size:1rem; font-family:inherit; color-scheme:dark;
+}
+.fld textarea{min-height:84px; resize:vertical;}
+.fld input:focus,.fld textarea:focus{outline:none; border-color:var(--gold);}
+.fld .hint{font-size:.75rem; color:#42598a; margin-top:4px;}
 .foot{
   text-align:center; color:#42598a; font-size:.78rem; margin-top:22px;
 }
@@ -178,6 +225,12 @@ sup{font-size:.72em;}
       <h3>⏱️ Test mode <span class="pill" id="lastTest" style="display:none"></span></h3>
       <p>20 random questions, 40-minute timer, weak-topic breakdown at the end.</p>
       <button class="btn ghost" id="btnTest">Start mock test</button>
+    </div>
+
+    <div class="card">
+      <h3>🛩️ Flying lessons <span class="pill" id="lessonCount"></span></h3>
+      <p>Your training logbook — debriefs, what to work on, and the plan for next time.</p>
+      <button class="btn blue" id="btnLessons">Open logbook</button>
     </div>
 
     <h3 style="margin:18px 4px 10px;">Topics <span class="pill">tap to practise — 12 correct = mastered</span></h3>
@@ -234,6 +287,44 @@ sup{font-size:.72em;}
       <div id="rRows"></div>
     </div>
     <button class="btn" id="rAgain">Go again</button>
+  </div>
+
+  <!-- ============ LESSON LOGBOOK ============ -->
+  <div class="screen" id="scr-lessons">
+    <div class="qhead">
+      <button class="back" id="lBack">‹ Home</button>
+      <div class="mid">🛩️ Lesson logbook</div>
+      <div style="width:64px"></div>
+    </div>
+    <div class="statrow">
+      <div class="stat"><b id="lsCount">0</b><small>lessons logged</small></div>
+      <div class="stat"><b id="lsHours">0</b><small>hours logged</small></div>
+      <div class="stat"><b id="lsLast">—</b><small>last lesson</small></div>
+    </div>
+    <button class="btn" id="btnAddLesson" style="margin-bottom:14px;">+ Add a lesson</button>
+    <div id="lessonList"></div>
+  </div>
+
+  <!-- ============ LESSON FORM ============ -->
+  <div class="screen" id="scr-lessonform">
+    <div class="qhead">
+      <button class="back" id="lfBack">‹ Cancel</button>
+      <div class="mid" id="lfTitle">New lesson</div>
+      <div style="width:64px"></div>
+    </div>
+    <div class="card">
+      <div class="fld"><label>Date</label><input type="date" id="lfDate"></div>
+      <div class="fld"><label>Title</label><input id="lfName" placeholder="e.g. Circuits at Headcorn"></div>
+      <div class="fld"><label>Instructor</label><input id="lfInstr" placeholder="e.g. Will Pickard"></div>
+      <div class="fld"><label>Aircraft</label><input id="lfAc" placeholder="e.g. G-ABCD"></div>
+      <div class="fld"><label>Exercises</label><input id="lfEx" placeholder="e.g. Ex 12 &amp; 13 — circuits"></div>
+      <div class="fld"><label>Duration (hours)</label><input type="number" step="0.1" min="0" id="lfHours" placeholder="e.g. 1.2"></div>
+      <div class="fld"><label>✅ What went well</label><textarea id="lfWell"></textarea><div class="hint">One point per line</div></div>
+      <div class="fld"><label>🔧 To work on</label><textarea id="lfWork"></textarea><div class="hint">One point per line</div></div>
+      <div class="fld"><label>🎯 Plan for next time</label><textarea id="lfPlan"></textarea><div class="hint">One point per line</div></div>
+      <div class="fld"><label>📝 Notes</label><textarea id="lfNotes"></textarea></div>
+    </div>
+    <button class="btn" id="lfSave">Save lesson</button>
   </div>
 
 </div>
@@ -749,6 +840,7 @@ function renderHome(){
   const mastered=TOPICS.filter(t=>tp(t.id).c>=MASTER).length;
   $('#stMastered').textContent=mastered+'/13';
   $('#warmDone').style.display=S.warm[todayStr()]!=null?'inline':'none';
+  $('#lessonCount').textContent=(S.lessons||[]).length+' logged';
   const lt=S.tests[S.tests.length-1];
   if(lt){$('#lastTest').style.display='inline-block';$('#lastTest').textContent=`last: ${lt.score}/20`;}
   const list=$('#topicList');list.innerHTML='';
@@ -974,9 +1066,131 @@ $('#qBack').onclick=()=>{
   renderHome();show('#scr-home');
 };
 $('#rBack').onclick=()=>{renderHome();show('#scr-home');};
+/* ================= lesson logbook ================= */
+const SEED_LESSON={id:1,date:'2026-07-27',title:'Circuits at Headcorn',instructor:'Will Pickard',aircraft:'',
+ exercises:'Ex 12 & 13 — circuits, approach & landing',hours:'',
+ well:[
+  'Seven circuits flown, including a glide approach and landing — great fun and nicely handled',
+  'Two good go-around decisions: one too far right of the centreline, one after a bounce',
+  'Judged the crosswind yourself: wind from the right → right wing down, rudder to keep it straight',
+  'Will stayed off the controls and let you get on with it',
+ ],
+ work:[
+  'Both feet on the pedals during start and run-up',
+  'Go-around drill: full power, pitch, carb heat cold, one stage of flap up — next stage at 300 ft with a positive climb',
+  'Entering a climb: Power → Attitude → Trim. Levelling off: Attitude → let speed build → Power → Trim',
+  'Learn the pitch attitudes for each power setting',
+  'Checks discipline: after-takeoff checks (flap!), FREDA en-route checks, downwind checks',
+  'Radio calls — really nail these down',
+  'Flare judgement: the wide uphill runway tempts an early, high flare — drifted off the centreline on landing',
+ ],
+ plan:[
+  'Double session tomorrow, 10:00 — drill circuits, same aircraft',
+  'Consider Southend: hard runway with a centreline gives better cues for the flare (≈£70 landing fee)',
+  'Emergencies in the circuit — more glide approaches (warm the engine on the way down)',
+ ],
+ notes:'About 40 hours logged so far, plus a few more at Stapleford — records being transferred over. Next: keep drilling exercises 12 & 13.',
+ transcript:`Fake. Brother. Fuddles. During start. run out. Okay. Um... Uh, let me get that, see, compliance for the 3 biscuits next time, I think. Oh, yeah. Seven circuits. See so I can see I. I, I'll CUI, KS. Suck his... at head corner. Do you actually, do you, do we do 2 go-rounds or one? We did one when we were to the right. Yeah, we, um, possibly two. Yeah, I read it too, with to go around. One, two. Two... Two, high margin. Off the centre line. Two pounds. Nice guy runs very well. Remember... Funny, shocking, but. money on. Okay, so so I remember I both feed on the pedals during start and run-up. Um, would it send suckers a head con to go arounds one the one of them we were bit too far off to the right of the centre line. The other one, we did a bounce, but they were, you know, go around, really not happy. Right. Uh, full power, if you're, if you've got flat 30, full power, pitch, copy, cold, and then one stage of flat, and then 500 feet. Or 300 feet, next stage or flat, possible climb. Yeah, all good stuff. Remember the pitch attitudes? on power. Attention to. Yeah, so it's. The acronym. It's out. It's, um, attitude power trim. Oh, yeah. I'll ask you trim. I was doing power... When we when we enter a climb, power attitude trim. Yes. When we level off from a climb, attitude, as a speed builds up, then we bring the power, reduce the power, you know, once we over nigee, then we drive it. Right, okay. B-A-T-A-P-T. Okay. Abby? That's happy. What purchase? Always. No practice. Great. Um, okay. Improving. And don't forget your own route checks, #um freedom. Yeah. Um, bump down, downward and stuff. you know, I noticed we hadn't set the field and after takeoff checks flat. Yes. Flat, um... And, um, Dan Winchex. Yeah. as well. I'd really like to nail down the radio calls and the checks. And then I think, I think the rest of it's, um, it's kind of like not intuition, but it's, it's, it's just practice. practice, you know. Should I play discipline and all? Good. So, so I'm going to save that. And then we're gonna do the... The other sector, so we're gonna put the ad new record. So... Yeah. Final centre. Yes. I find this much easier doing, although it's very easy not to. I find it easy just doing these you know. Yeah. So there's the last one who was #ah that was this 1647720? Yeah. That exercise 1213. 1213 yeah. And. No, I've I've got a few hours over at Stapleford, but they've got to send the records to here. Oh, good. So. That's good. It's 40 hours, but I think there'll be a few more. Right. They just, they, they just couldn't, haven't got the time there, yeah. And it's further away. It's another 40 minutes for me. Yeah. I do, yeah. What about lid? How fast live from here? Let's, let's about the same distance as here, probably a bit more. I mean, it's just, it's just, this, this, the landing piece and stuff, yeah, 70 quid, you know? Yeah. I mean, he's, he's, he's, he's, He has, you know, the cost of the planes and the maintenance and everything. Um, you know, and he's, he's, he's checked up our, our early road to 55 quid an hour for basic stuff. Everyone pays more to keep the stuff. Comments. What's his name? The owner? it? Hello. Anoop. Yeah. Oh, he's very, you would never know he was the Yenays. So... Gentle. No, we like it here. My friend works over at Formula One across the road. Alright, yeah. So we see him sometimes. Oh cool. You know, dad likes it here. Oh, big into it. Bigger. I mean, Bigger, the, you know, Bigger has a bigger, bigger. You know, it's sort of... And learning the calls, the radio calls. Yeah. Okay, um, I. Altitude on my good. All practice. Great. Recommendations. Well, practice, next exercise, 12 and 13. Actually, baby, do some emergencies in the circuit. Yeah, the gliding, the gliding one was good fun. Yeah. The gliding landing. I thought that was great. Yeah, these are these are sort of... We warmed up the engine a bit, but that was fine. That's the cheap. Yeah, if you're low, just say, I'm just walking up the engine. It's a cheap. But anyway, remember that one. Yeah, yeah, yeah, yeah, yeah. Good. Thanks, go. No, so, well, see, let's have a look, we're... It's calendar. Oh, it's just me and old J here, so. I love Siana. So I will see you at 10 AM. Any problems? I'll give I'll give you a ding dong, but otherwise, you know, it's um, And we can do, and it's a double tomorrow. I've got you for a session in the morning, then you've got someone. Yeah. Yeah, yeah. So where we just do, we just do the sort of, I think, I think circuits. I mean, drill it. Keep going. Yeah. Yeah, um, maybe maybe go somewhere different, maybe go to Southend. Up to you. Up to you. It costs more, but it's it's a hard run way. and I think I think you've got the idea with with headcorn, but to to, to, it's a bit of a, you know, Um, pros and cons. But I think to get, you know, the flare out, you see the, when you've got a runway, you can, you can, you can see it better. Right, you know, you left or right a centre. There's no centre line of head corn. And it was only because I'm sort of looking out the peripheral looking at the edge. But, you know, you've been there like maybe twice or something. Yeah. So I think you'll find it, I think you'll find it easier itself then. Okay. Although, although big and, you know, it does have a centreline coming into land here, we had, but it was plainly obvious, you see, that we drifted off a big end. And you see, here's the thing. You know, Ailerons, Ailerons, two. I mean, I, to get to get the most out of it, I don't want to be just riding you the whole time. Yeah, da, da, da, da, da. So I try not to say too much. And the idea of being a solid, I just let you get on with it. And I let you get on with it at big end and we landed a bit to one side. But also the, you see, here's the other thing. It's it's it's wide and it's uphill. So there is a tendency for you to actually get high, start the flare to, to, to, too early. which is kind of what we did. So, um, It's just, you can use you. You can use the. Aerons and you can use the rudder for landing, just notice it's like not a. Yeah, we'll put it. The wind was from the right, so we can put 11 wing down 1st. Yeah, it's not okay. You mustn't do this. You mustn't do that. It's more. You're judging it yourself, aren't you, with the conditions? Absolutely. Yeah, absolutely. And, and, you know, sufficient rudder input to make the complaint, played it all one. Yeah. Good. Well, I will see you. See you when I see you. in the morning.`};
+if(!S.lessons){S.lessons=[SEED_LESSON];save();}
+
+const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const MONTHS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+function dChip(iso){
+  const p=(iso||'').split('-');
+  if(p.length!==3)return '—';
+  return `${parseInt(p[2],10)}<br>${MONTHS[parseInt(p[1],10)-1]||''}`;
+}
+function lsec(cls,icon,title,items){
+  const li=(items||[]).filter(x=>x&&x.trim());
+  if(!li.length)return '';
+  return `<div class="lsec ${cls}"><h5>${icon} ${title}</h5><ul>${li.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>`;
+}
+function renderLessons(){
+  const Ls=S.lessons.slice().sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+  $('#lsCount').textContent=Ls.length;
+  const hrs=Ls.reduce((s,l)=>s+(parseFloat(l.hours)||0),0);
+  $('#lsHours').textContent=Math.round(hrs*10)/10;
+  $('#lsLast').innerHTML=Ls.length?dChip(Ls[0].date).replace('<br>',' '):'—';
+  const list=$('#lessonList');list.innerHTML='';
+  Ls.forEach(L=>{
+    const el=document.createElement('div');el.className='lesson';
+    const tags=[];
+    if(L.exercises)tags.push(`<span class="tag t2">📘 ${esc(L.exercises)}</span>`);
+    if(L.instructor)tags.push(`<span class="tag t3">👨‍✈️ ${esc(L.instructor)}</span>`);
+    if(L.aircraft)tags.push(`<span class="tag t4">🛩 ${esc(L.aircraft)}</span>`);
+    if(L.hours)tags.push(`<span class="tag t1">⏱ ${esc(L.hours)} h</span>`);
+    el.innerHTML=`
+      <div class="lhead">
+        <div class="date">${dChip(L.date)}</div>
+        <div class="lt"><b>${esc(L.title)||'Lesson'}</b><small>${(L.work||[]).length} point${(L.work||[]).length===1?'':'s'} to work on</small></div>
+        <div class="chev">›</div>
+      </div>
+      <div class="lbody">
+        ${tags.length?`<div class="tagrow">${tags.join('')}</div>`:''}
+        ${lsec('well','✅','What went well',L.well)}
+        ${lsec('work','🔧','To work on',L.work)}
+        ${lsec('plan','🎯','Plan for next time',L.plan)}
+        ${L.notes&&L.notes.trim()?`<div class="lsec note"><h5>📝 Notes</h5><p>${esc(L.notes)}</p></div>`:''}
+        ${L.transcript?`<details class="raw"><summary>🎙 Full debrief transcript</summary><p>${esc(L.transcript)}</p></details>`:''}
+        <div class="lactions">
+          <button class="btn ghost small ed">✏️ Edit</button>
+          <button class="btn danger small del">🗑 Delete</button>
+        </div>
+      </div>`;
+    el.querySelector('.lhead').onclick=()=>el.classList.toggle('open');
+    el.querySelector('.ed').onclick=e=>{e.stopPropagation();openLessonForm(L);};
+    el.querySelector('.del').onclick=e=>{
+      e.stopPropagation();
+      if(confirm('Delete this lesson entry?')){
+        S.lessons=S.lessons.filter(x=>x.id!==L.id);save();renderLessons();toast('Lesson deleted');
+      }
+    };
+    list.appendChild(el);
+  });
+  if(!Ls.length)list.innerHTML='<div class="card"><p style="margin:0">No lessons yet — tap “Add a lesson” after your next flight.</p></div>';
+}
+let editingId=null;
+function openLessonForm(L){
+  editingId=L?L.id:null;
+  $('#lfTitle').textContent=L?'Edit lesson':'New lesson';
+  $('#lfDate').value=L?L.date:todayStr();
+  $('#lfName').value=L?L.title:'';
+  $('#lfInstr').value=L?L.instructor:'';
+  $('#lfAc').value=L?L.aircraft:'';
+  $('#lfEx').value=L?L.exercises:'';
+  $('#lfHours').value=L?L.hours:'';
+  $('#lfWell').value=L?(L.well||[]).join('\n'):'';
+  $('#lfWork').value=L?(L.work||[]).join('\n'):'';
+  $('#lfPlan').value=L?(L.plan||[]).join('\n'):'';
+  $('#lfNotes').value=L?L.notes:'';
+  show('#scr-lessonform');
+}
+const lines=v=>v.split('\n').map(s=>s.trim()).filter(Boolean);
+$('#lfSave').onclick=()=>{
+  const L=editingId?S.lessons.find(x=>x.id===editingId):{id:Date.now(),transcript:''};
+  if(editingId&&!L)return;
+  L.date=$('#lfDate').value||todayStr();
+  L.title=$('#lfName').value.trim();
+  L.instructor=$('#lfInstr').value.trim();
+  L.aircraft=$('#lfAc').value.trim();
+  L.exercises=$('#lfEx').value.trim();
+  L.hours=$('#lfHours').value.trim();
+  L.well=lines($('#lfWell').value);
+  L.work=lines($('#lfWork').value);
+  L.plan=lines($('#lfPlan').value);
+  L.notes=$('#lfNotes').value.trim();
+  if(!editingId)S.lessons.push(L);
+  save();renderLessons();show('#scr-lessons');toast(editingId?'Lesson updated':'✔ Lesson logged');
+  editingId=null;
+};
+$('#btnLessons').onclick=()=>{renderLessons();show('#scr-lessons');};
+$('#btnAddLesson').onclick=()=>openLessonForm(null);
+$('#lBack').onclick=()=>{renderHome();show('#scr-home');};
+$('#lfBack').onclick=()=>{editingId=null;show('#scr-lessons');};
+
 $('#btnReset').onclick=()=>{
-  if(confirm('Reset ALL progress? This cannot be undone.')){
-    S={topics:{},best:0,answered:0,right:0,warm:{},tests:[]};save();renderHome();toast('Progress reset');
+  if(confirm('Reset ALL question progress? (Your lesson logbook is kept.) This cannot be undone.')){
+    S={topics:{},best:0,answered:0,right:0,warm:{},tests:[],lessons:S.lessons||[]};save();renderHome();toast('Progress reset');
   }
 };
 renderHome();
