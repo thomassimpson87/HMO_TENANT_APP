@@ -208,10 +208,25 @@ details.raw p{white-space:pre-wrap; margin:8px 0 0;}
 .chk.on .box{background:var(--green); border-color:var(--green);}
 .chk .lab{flex:1;}
 .chk.on .lab{color:var(--dim); text-decoration:line-through;}
-.chk .jump{
+.jump{
   background:var(--card2); border:1px solid var(--line); color:var(--gold2);
   border-radius:9px; padding:6px 10px; font-size:.75rem; font-weight:800; cursor:pointer; flex:none;
 }
+/* formula sheet */
+.fitem{
+  display:flex; align-items:center; gap:10px;
+  background:var(--card); border:1px solid var(--line); border-radius:12px;
+  padding:11px 13px; margin-bottom:8px;
+}
+.fitem .fmain{flex:1; min-width:0;}
+.fitem .ff{display:block; font-weight:800; color:var(--gold2); font-size:1.05rem;}
+.fitem .fn{display:block; color:var(--dim); font-size:.8rem; margin-top:2px;}
+.fsearch{
+  width:100%; background:#0c1c3a; border:1px solid var(--line); border-radius:12px;
+  color:var(--ink); padding:13px 14px; font-size:1rem; font-family:inherit; margin-bottom:12px;
+}
+.fsearch:focus{outline:none; border-color:var(--gold);}
+.fsec{margin:16px 4px 10px; font-size:.95rem; color:var(--gold2);}
 .readlink{
   display:block; background:#0d2f4d; border:1px solid #1d5c8a; color:#7cc7ff;
   border-radius:12px; padding:12px 14px; font-weight:700; text-decoration:none; font-size:.92rem;
@@ -252,6 +267,12 @@ sup{font-size:.72em;}
       <h3>⏱️ Mock exam <span class="pill" id="lastTest" style="display:none"></span></h3>
       <p>The real paper format: 30 questions (⅔ maths, ⅓ physics), 60 minutes, 75% to pass. Calculator allowed — just like the real thing.</p>
       <button class="btn ghost" id="btnTest">Start mock exam</button>
+    </div>
+
+    <div class="card">
+      <h3>📐 Formula sheet</h3>
+      <p>Every formula on the paper in one place — searchable, with practice links.</p>
+      <button class="btn ghost" id="btnFormulas">Open formula sheet</button>
     </div>
 
     <div class="card">
@@ -320,6 +341,17 @@ sup{font-size:.72em;}
       <div id="rRows"></div>
     </div>
     <button class="btn" id="rAgain">Go again</button>
+  </div>
+
+  <!-- ============ FORMULA SHEET ============ -->
+  <div class="screen" id="scr-formulas">
+    <div class="qhead">
+      <button class="back" id="fBack">‹ Home</button>
+      <div class="mid">📐 Formula sheet</div>
+      <div style="width:64px"></div>
+    </div>
+    <input class="fsearch" id="fSearch" type="search" placeholder="Search… e.g. energy, gas, trig" autocomplete="off">
+    <div id="formulaList"></div>
   </div>
 
   <!-- ============ EXAM GUIDE ============ -->
@@ -1370,6 +1402,81 @@ $('#qBack').onclick=()=>{
   renderHome();show('#scr-home');
 };
 $('#rBack').onclick=()=>{renderHome();show('#scr-home');};
+/* ================= formula sheet ================= */
+const FORMULAS=[
+ ['Maths essentials',[
+  ['v = d ÷ t','Speed, distance, time','cover the one you want; knots = nm per hour','sdt'],
+  ['new = old × (1 ± p⁄100)','Percentage change as a multiplier','+15% → ×1.15, −20% → ×0.8 (runway performance style)','frac'],
+  ['x% of N = N × x ÷ 100','Percentage of an amount','10% = ÷10, then build up','frac'],
+  ['y = kx','Direct proportion','double x → double y; straight line through origin','prop'],
+  ['y = k ÷ x','Inverse proportion','double x → halve y','prop'],
+  ['y ∝ x² → scale factor²','Proportion with powers','double x → y × 4 (e.g. KE and speed)','prop'],
+  ['sin θ = O⁄H&nbsp; cos θ = A⁄H&nbsp; tan θ = O⁄A','SOHCAHTOA','finding sides in right-angled triangles','trig'],
+  ['θ = sin⁻¹, cos⁻¹ or tan⁻¹ of the ratio','Inverse trig','finding the ANGLE from two known sides','trig'],
+  ['c² = a² + b²','Pythagoras','hypotenuse from the two shorter sides','trig'],
+  ['x<sup>a</sup> × x<sup>b</sup> = x<sup>a+b</sup>&nbsp; x<sup>a</sup> ÷ x<sup>b</sup> = x<sup>a−b</sup>&nbsp; (x<sup>a</sup>)<sup>b</sup> = x<sup>ab</sup>','Index laws','multiply → add, divide → subtract, power → multiply','indices'],
+  ['k=10³ M=10⁶ G=10⁹ · m=10⁻³ µ=10⁻⁶ n=10⁻⁹','SI prefixes','kilo/mega/giga up, milli/micro/nano down','indices'],
+ ]],
+ ['Motion & forces',[
+  ['F = m × a','Newton\'s 2nd law','resultant force; also a = F÷m, m = F÷a','mech'],
+  ['W = m × g','Weight','use g ≈ 9.81 (≈10) N/kg; weight is a force in newtons','mech'],
+  ['p = m × v','Momentum','conserved in collisions when no external force acts','mech'],
+  ['a = (v − u) ÷ t','Acceleration','change in velocity over time','mech'],
+  ['Moment = F × d','Turning effect','force × perpendicular distance from the pivot; balance: F₁d₁ = F₂d₂','mech'],
+  ['Component: F cos θ (adjacent), F sin θ (opposite)','Resolving a vector','splitting a force or velocity into perpendicular parts','vectors'],
+ ]],
+ ['Energy & power',[
+  ['W = F × d','Work done','joules; force moving something through a distance','energy'],
+  ['P = W ÷ t&nbsp; and &nbsp;P = F × v','Power (two forms)','watts; work per second, or force × velocity','energy'],
+  ['KE = ½ m v²','Kinetic energy','watch it: quadruples when speed doubles','energy'],
+  ['GPE = m g h','Gravitational PE','converts to KE when falling: v = √(2gh)','energy'],
+  ['Efficiency = useful ÷ input × 100%','Efficiency','energy is conserved, but some is always wasted','energy'],
+  ['E = m c ΔT','Heating energy','specific heat capacity × mass × temperature rise','waves'],
+ ]],
+ ['Gases & pressure',[
+  ['P = F ÷ A','Pressure','pascals; same force, smaller area → more pressure','pressure'],
+  ['ρ = m ÷ V','Density','kg/m³; falls with altitude','pressure'],
+  ['P = ρ g h','Pressure in a fluid','depth pressure in liquid columns','pressure'],
+  ['P₁V₁ = P₂V₂','Boyle\'s law','constant temperature; squeeze it → pressure up','pressure'],
+  ['V₁⁄T₁ = V₂⁄T₂','Charles\' law','constant pressure; T in KELVIN','pressure'],
+  ['P₁⁄T₁ = P₂⁄T₂','Gay-Lussac\'s law','constant volume; T in KELVIN','pressure'],
+  ['P V ⁄ T = constant','Combined gas law','all three laws in one','pressure'],
+  ['K = °C + 273','Kelvin scale','always convert before gas-law sums; ISA sea level = 288 K','pressure'],
+ ]],
+ ['Waves & extras',[
+  ['v = f × λ','Wave equation','speed = frequency × wavelength','waves'],
+  ['T = 1 ÷ f','Period','seconds per cycle','waves'],
+  ['V = I × R&nbsp; and &nbsp;P = I × V','Ohm\'s law & electrical power','bonus — not on the paper','elec'],
+  ['°F = 1.8 × °C + 32','Temperature conversion','bonus — handy: 15 °C (ISA) = 59 °F','units'],
+ ]],
+];
+function renderFormulas(filter){
+  const f=(filter||'').trim().toLowerCase();
+  const list=$('#formulaList');list.innerHTML='';
+  let shown=0;
+  FORMULAS.forEach(sec=>{
+    const items=sec[1].filter(it=>!f||(sec[0]+' '+it[0]+' '+it[1]+' '+it[2]).toLowerCase().includes(f));
+    if(!items.length)return;
+    const h=document.createElement('h3');h.className='fsec';h.textContent=sec[0];
+    list.appendChild(h);
+    items.forEach(it=>{
+      shown++;
+      const d=document.createElement('div');d.className='fitem';
+      d.innerHTML=`<div class="fmain"><span class="ff">${it[0]}</span><span class="fn">${it[1]} — ${it[2]}</span></div>`;
+      if(it[3]){
+        const j=document.createElement('button');j.className='jump';j.textContent='Practise';
+        j.onclick=()=>openConcept(it[3]);
+        d.appendChild(j);
+      }
+      list.appendChild(d);
+    });
+  });
+  if(!shown)list.innerHTML='<div class="card"><p style="margin:0">No formulas match — try a shorter search.</p></div>';
+}
+$('#btnFormulas').onclick=()=>{$('#fSearch').value='';renderFormulas('');show('#scr-formulas');};
+$('#fSearch').oninput=e=>renderFormulas(e.target.value);
+$('#fBack').onclick=()=>{renderHome();show('#scr-home');};
+
 /* ================= exam guide (official Stapleford topic list) ================= */
 const GUIDE={
  maths:[
