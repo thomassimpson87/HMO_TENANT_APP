@@ -435,6 +435,8 @@ function distract(c){
   }
   return out;
 }
+const r1=n=>Math.round(n*10)/10;
+const DEG=Math.PI/180;
 /* gen wrapper: d = difficulty 1-3, f returns {text, correct, wrong?, unit?, steps} */
 const g=(d,f)=>({d,f});
 
@@ -470,6 +472,10 @@ const TOPICS=[
   ]);return{text:`Substitute and evaluate:<br>${p.t}`,correct:p.v,steps:p.s};}),
   g(3,()=>{const c=ri(2,5),q2=ri(2,6),tot=c*q2,b=ri(1,tot-1),a=tot-b;return{text:`Work out: (${a} + ${b}) ÷ ${c}`,correct:q2,
    steps:['Brackets first.',`${a} + ${b} = ${tot}`,`${tot} ÷ ${c} = ${q2}`]};}),
+  g(2,()=>{const a=pick([1.5,2.5,3.2,4.5]),b=ri(2,4),c=pick([1.2,1.5,2.5,0.5]),ans=r1(a+b*c);
+   return{text:`Use a calculator: ${fmt(a)} + ${b} × ${fmt(c)}`,correct:ans,
+   wrong:[r1((a+b)*c),r1(ans*10),r1(ans+1)].filter((v,i,arr)=>v!==ans&&arr.indexOf(v)===i),
+   steps:['BIDMAS still applies with a calculator — multiply first!',`${b} × ${fmt(c)} = ${fmt(r1(b*c))}`,`${fmt(a)} + ${fmt(r1(b*c))} = ${fmt(ans)}`,`(A basic calculator that works left-to-right gives ${fmt(r1((a+b)*c))} — wrong.)`]};}),
  ]},
 /* ---------- 1 REARRANGING ---------- */
 {id:'rearr',name:'Rearranging equations',icon:'🔧',cat:'math',
@@ -616,6 +622,20 @@ const TOPICS=[
    {k:'opposite and the adjacent',a:'tan⁻¹ (opp ÷ adj)',w:['sin⁻¹ (opp ÷ adj)','cos⁻¹ (opp ÷ adj)','tan (opp ÷ adj)']},
   ]);return{text:`You know the ${p.k} and want the ANGLE. Which calculator function do you use?`,correct:p.a,wrong:p.w,
    steps:['To go from a ratio back to the angle, use the INVERSE function','(sin⁻¹, cos⁻¹ or tan⁻¹ — usually SHIFT + sin/cos/tan).',`Here: ${p.a}`]};}),
+  g(3,()=>{const th=pick([20,25,30,35,40,50,55,60,65,70]),hyp=pick([8,12,15,20,25,30,40]);
+   const useSin=Math.random()<.5,fn=useSin?'sin':'cos',side=useSin?'opposite':'adjacent';
+   const val=r1(hyp*(useSin?Math.sin(th*DEG):Math.cos(th*DEG)));
+   const cands=[r1(hyp*(useSin?Math.cos(th*DEG):Math.sin(th*DEG))),r1(hyp*Math.tan(th*DEG)),r1(val*10),r1(val/10)]
+     .filter((v,i,a)=>v!==val&&v>0&&a.indexOf(v)===i).slice(0,3);
+   return{text:`A right-angled triangle has hypotenuse ${hyp} and an angle of ${th}°. Use a calculator to find the ${side} side (1 d.p.).`,
+   correct:val,wrong:cands,
+   steps:[`${side==='opposite'?'Opp = Hyp × sin θ':'Adj = Hyp × cos θ'}`,`= ${hyp} × ${fn} ${th}° = ${hyp} × ${(useSin?Math.sin(th*DEG):Math.cos(th*DEG)).toFixed(3)}…`,`≈ ${val}  — watch the decimal point: shifted-decimal answers are the classic ATPL trap!`]};}),
+  g(3,()=>{const opp=ri(3,12);let adj=ri(3,15);if(adj===opp)adj++;
+   const th=Math.round(Math.atan(opp/adj)/DEG);
+   const cands=[90-th,th+7,th-7,th+15].filter((v,i,a)=>v!==th&&v>0&&v<90&&a.indexOf(v)===i).slice(0,3).map(v=>v+'°');
+   return{text:`A right-angled triangle has opposite = ${opp} and adjacent = ${adj}. Use a calculator to find the angle (nearest degree).`,
+   correct:th+'°',wrong:cands,
+   steps:['tan θ = Opp ÷ Adj',`tan θ = ${opp} ÷ ${adj} = ${(opp/adj).toFixed(3)}…`,`θ = tan⁻¹(${(opp/adj).toFixed(3)}…) ≈ ${th}°`]};}),
  ]},
 /* ---------- 4 FRACTIONS PERCENTAGES RATIOS ---------- */
 {id:'frac',name:'Fractions, percentages, ratios',icon:'➗',cat:'math',
@@ -800,6 +820,19 @@ const TOPICS=[
   g(3,()=>{const tas=pick([150,180,200]),hw=pick([30,50]),gs=tas-hw,d=gs*2;
    return{text:`TAS ${tas} kt with a ${hw} kt headwind component. How long to fly ${d} nm?`,correct:2,unit:' h',
    steps:[`GS = ${tas} − ${hw} = ${gs} kt`,`Time = distance ÷ GS = ${d} ÷ ${gs}`,`= 2 hours`]};}),
+  g(3,()=>{const F=pick([50,80,100,120,200]),th=pick([20,25,30,35,40,50,55,60,65,70]);
+   const horiz=Math.random()<.5,val=r1(F*(horiz?Math.cos(th*DEG):Math.sin(th*DEG)));
+   const cands=[r1(F*(horiz?Math.sin(th*DEG):Math.cos(th*DEG))),r1(val*10),r1(val/10),r1(F*Math.tan(th*DEG))]
+     .filter((v,i,a)=>v!==val&&v>0&&a.indexOf(v)===i).slice(0,3);
+   return{text:`A force of ${F} N acts at ${th}° above the horizontal. Use a calculator to find its ${horiz?'horizontal':'vertical'} component (1 d.p.).`,
+   correct:val,unit:' N',wrong:cands,
+   steps:['Resolve the force:',`${horiz?'Horizontal = F × cos θ':'Vertical = F × sin θ'}`,`= ${F} × ${horiz?'cos':'sin'} ${th}° ≈ ${val} N`]};}),
+  g(3,()=>{const p=pick([[30,40,50,53],[40,30,50,37],[60,80,100,53],[80,60,100,37],[50,120,130,67],[120,50,130,23]]);
+   const bear=String(p[3]).padStart(3,'0');
+   return{text:`An aircraft flies ${p[0]} km due north (A to B), then ${p[1]} km due east (B to C). What is the straight-line distance and bearing from A to C?`,
+   correct:`${p[2]} km, bearing ${bear}°`,
+   wrong:[`${p[2]} km, bearing ${String(90-p[3]).padStart(3,'0')}°`,`${p[0]+p[1]} km, bearing ${bear}°`,`${p[2]} km, bearing ${String(180+p[3]).padStart(3,'0')}°`],
+   steps:['Distance: Pythagoras.',`AC = √(${p[0]}² + ${p[1]}²) = √${p[0]*p[0]+p[1]*p[1]} = ${p[2]} km`,'Bearing: angle east of north = tan⁻¹(east ÷ north)',`= tan⁻¹(${p[1]} ÷ ${p[0]}) ≈ ${p[3]}° → bearing ${bear}°`]};}),
  ]},
 /* ---------- 8 MECHANICS ---------- */
 {id:'mech',name:'Mechanics — forces, momentum, moments',icon:'⚙️',cat:'phys',
@@ -845,6 +878,22 @@ const TOPICS=[
   g(3,()=>{const p=pick([[4,6,8,2],[2,9,4,3],[6,5,4,3],[3,8,5,2.4]]);const tot=p[0]*p[1],mSum=p[0]+p[2];
    return{text:`A ${p[0]} kg trolley at ${p[1]} m/s collides with a stationary ${p[2]} kg trolley and they stick together. Speed afterwards?`,correct:p[3],unit:' m/s',
    steps:['Momentum is conserved.',`Before: ${p[0]} × ${p[1]} = ${tot} kg·m/s`,`After: ${tot} ÷ (${p[0]} + ${p[2]}) = ${tot} ÷ ${mSum}`,`= ${fmt(p[3])} m/s`]};}),
+  g(1,()=>{const p=pick([
+   {q:'Force',a:'Newtons (N)',w:['Joules (J)','Watts (W)','Kilograms (kg)']},
+   {q:'Energy',a:'Joules (J)',w:['Newtons (N)','Watts (W)','Pascals (Pa)']},
+   {q:'Power',a:'Watts (W)',w:['Joules (J)','Newtons (N)','Amperes (A)']},
+   {q:'Pressure',a:'Pascals (Pa)',w:['Newtons (N)','Joules (J)','Kilograms (kg)']},
+   {q:'Frequency',a:'Hertz (Hz)',w:['Seconds (s)','Watts (W)','Metres (m)']},
+   {q:'Mass',a:'Kilograms (kg)',w:['Newtons (N)','Pounds-force','Joules (J)']},
+  ]);return{text:`What is the SI unit of ${p.q.toLowerCase()}?`,correct:p.a,wrong:p.w,
+   steps:['Core SI units: force N, energy J, power W,','pressure Pa, frequency Hz, mass kg.',`${p.q} → ${p.a}`]};}),
+  g(2,()=>{const p=pick([[400,300],[250,100],[600,200],[500,150]]),disp=p[0]-p[1],tot=p[0]+p[1],askDisp=Math.random()<.6;
+   return askDisp?{text:`An aircraft flies ${p[0]} km due east, then ${p[1]} km due west. What is its displacement from the start?`,
+    correct:`${disp} km east`,wrong:[`${tot} km`,`${disp} km west`,`${p[0]} km east`],
+    steps:['Displacement = straight line from start to finish, WITH direction.',`${p[0]} east − ${p[1]} west = ${disp} km east`,`(The distance travelled is ${tot} km — a scalar, different thing!)`]}
+   :{text:`An aircraft flies ${p[0]} km due east, then ${p[1]} km due west. What total DISTANCE has it travelled?`,
+    correct:`${tot} km`,wrong:[`${disp} km`,`${disp} km east`,`${p[0]} km`],
+    steps:['Distance is the total ground covered — a scalar, no direction.',`${p[0]} + ${p[1]} = ${tot} km`,`(Its displacement is only ${disp} km east.)`]};}),
   g(3,()=>{const p=pick([
    {q:'At terminal velocity, a falling object…',a:'Has zero acceleration — drag equals weight',w:['Keeps accelerating','Has zero drag','Starts to slow down'],s:['Drag grows with speed until it balances weight.','Balanced forces → no resultant → constant (terminal) velocity.']},
    {q:'Inertia is best described as…',a:'Resistance to a change in motion',w:['A type of friction','The force of gravity','Energy stored in motion'],s:['Inertia depends only on mass:','more mass → harder to start, stop, or turn.']},
@@ -1337,7 +1386,7 @@ const GUIDE={
   ['Pythagoras\' theorem','trig'],
  ],
  phys:[
-  ['SI units',null],
+  ['SI units','mech'],
   ['Scalars vs vectors','mech'],
   ['Speed, distance, time','sdt'],
   ['Displacement, velocity & acceleration','mech'],
